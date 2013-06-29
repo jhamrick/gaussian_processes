@@ -3,9 +3,6 @@ __all__ = ["GP"]
 import numpy as np
 import copy
 
-from numpy import dot, log, pi, exp, trace
-from numpy.linalg import inv, cholesky
-
 
 def memoprop(f):
     """Memoized property.
@@ -133,23 +130,23 @@ class GP(object):
     @memoprop
     def Lxx(self):
         """Cholesky decomposition of K(x, x')"""
-        return cholesky(self.Kxx)
+        return np.linalg.cholesky(self.Kxx)
 
     @memoprop
     def inv_Lxx(self):
         """Inverse cholesky decomposition of K(x, x')"""
-        return inv(self.Lxx)
+        return np.linalg.inv(self.Lxx)
 
     @memoprop
     def inv_Kxx(self):
         """Inverse of K(x, x')"""
         Li = self.inv_Lxx
-        return dot(Li.T, Li)
+        return np.dot(Li.T, Li)
 
     @memoprop
     def inv_Kxx_y(self):
         """Dot product of inv(K(x, x')) and y"""
-        return dot(self.inv_Kxx, self._y)
+        return np.dot(self.inv_Kxx, self._y)
 
     @memoprop
     def log_lh(self):
@@ -169,16 +166,16 @@ class GP(object):
         except np.linalg.LinAlgError:
             return -np.inf
 
-        data_fit = -0.5 * dot(y.T, Kiy)
+        data_fit = -0.5 * np.dot(y.T, Kiy)
         complexity_penalty = -0.5 * logdet
-        constant = -0.5 * y.size * log(2 * pi)
+        constant = -0.5 * y.size * np.log(2 * np.pi)
         llh = data_fit + complexity_penalty + constant
         return llh
 
     @property
     def lh(self):
         """The likelihood of y given x and theta. See GP.log_lh"""
-        return exp(self.log_lh)
+        return np.exp(self.log_lh)
 
     @memoprop
     def dloglh_dtheta(self):
@@ -210,8 +207,8 @@ class GP(object):
         dloglh = np.empty(nparam)
         for i in xrange(dloglh.size):
             k = np.dot(Ki, dK_dtheta[i])
-            t0 = 0.5 * dot(y.T, np.dot(k, self.inv_Kxx_y))
-            t1 = -0.5 * trace(k)
+            t0 = 0.5 * np.dot(y.T, np.dot(k, self.inv_Kxx_y))
+            t1 = -0.5 * np.trace(k)
             dloglh[i] = t0 + t1
 
         return dloglh
@@ -241,9 +238,9 @@ class GP(object):
         lh = self.lh
         dlh = np.empty(nparam)
         for i in xrange(dlh.size):
-            KidK = dot(Ki, dK_dtheta[i])
-            t0 = dot(y.T, dot(KidK, Kiy))
-            t1 = trace(KidK)
+            KidK = np.dot(Ki, dK_dtheta[i])
+            t0 = np.dot(y.T, np.dot(KidK, Kiy))
+            t1 = np.trace(KidK)
             dlh[i] = 0.5 * lh * (t0 - t1)
 
         return dlh
@@ -263,7 +260,7 @@ class GP(object):
         dK = np.empty((nparam, y.size, y.size))
         dK[:-1] = self.K.jacobian(x, x)
         dK[-1] = np.eye(y.size) * 2 * self._s
-        dKi = [dot(-Ki, dot(dK[i], Ki)) for i in xrange(nparam)]
+        dKi = [np.dot(-Ki, np.dot(dK[i], Ki)) for i in xrange(nparam)]
 
         # second kernel derivatives
         d2K = np.zeros((nparam, nparam, y.size, y.size))
@@ -277,17 +274,17 @@ class GP(object):
 
         d2lh = np.empty((nparam, nparam))
         for i in xrange(nparam):
-            KidK_i = dot(Ki, dK[i])
-            ydKi_iy = dot(y.T, dot(KidK_i, Kiy))
-            ydKi_iy_tr = ydKi_iy - trace(KidK_i)
+            KidK_i = np.dot(Ki, dK[i])
+            ydKi_iy = np.dot(y.T, np.dot(KidK_i, Kiy))
+            ydKi_iy_tr = ydKi_iy - np.trace(KidK_i)
 
             for j in xrange(nparam):
-                dKi_jdK_i = dot(dKi[j], dK[i])
+                dKi_jdK_i = np.dot(dKi[j], dK[i])
                 d_ydKi_iy = (
-                    dot(y.T, dot(dKi_jdK_i, Kiy)) +
-                    dot(Kiy.T, dot(d2K[i, j], Kiy)) +
-                    dot(Kiy.T, dot(dK[i], dot(dKi[j], y))))
-                d_tr = trace(dKi_jdK_i + dot(Ki, d2K[i, j]))
+                    np.dot(y.T, np.dot(dKi_jdK_i, Kiy)) +
+                    np.dot(Kiy.T, np.dot(d2K[i, j], Kiy)) +
+                    np.dot(Kiy.T, np.dot(dK[i], np.dot(dKi[j], y))))
+                d_tr = np.trace(dKi_jdK_i + np.dot(Ki, d2K[i, j]))
 
                 t0 = dlh[j] * ydKi_iy_tr
                 t1 = lh * (d_ydKi_iy - d_tr)
@@ -334,7 +331,7 @@ class GP(object):
             for machine learning. MIT Press.
 
         """
-        return dot(self.Kxox(xo), self.inv_Kxx_y)
+        return np.dot(self.Kxox(xo), self.inv_Kxx_y)
 
     def cov(self, xo):
         """Predictive covariance of the GP.
@@ -352,4 +349,4 @@ class GP(object):
         Kxoxo = self.Kxoxo(xo)
         Kxox = self.Kxox(xo)
         Kxxo = self.Kxxo(xo)
-        return Kxoxo - dot(Kxox, dot(self.inv_Kxx, Kxxo))
+        return Kxoxo - np.dot(Kxox, np.dot(self.inv_Kxx, Kxxo))
