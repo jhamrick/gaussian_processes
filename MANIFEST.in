@@ -1,0 +1,6 @@
+include README.md
+include CHANGELOG.md
+include COPYING.txt
+include gp.py
+recursive-include kernels *.py
+recursive-include tests *.py
