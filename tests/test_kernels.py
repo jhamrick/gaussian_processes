@@ -90,9 +90,10 @@ class TestKernels(object):
             approx_hess[:, i] = approx_deriv(jac0, jac1, dtheta)
 
         diff = hess - approx_hess
-        bad = np.abs(diff) > self.thresh
-        if (np.abs(diff) > self.thresh).any():
-            print "threshold:", self.thresh
+        thresh = 1e-4
+        bad = np.abs(diff) > thresh
+        if bad.any():
+            print "threshold:", thresh
             print "worst err:", np.abs(diff).max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             raise AssertionError("bad hessian")
