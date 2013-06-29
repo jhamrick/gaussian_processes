@@ -22,7 +22,7 @@ class TestGP(object):
     def __init__(self):
         self.N_big = opt['n_big_test_iters']
         self.N_small = opt['n_small_test_iters']
-        self.thresh = 1e-6
+        self.thresh = np.sqrt(EPS) * 10
         self.dtheta = np.sqrt(EPS) * 100
 
     def check_mean(self, gp, y):
@@ -57,9 +57,10 @@ class TestGP(object):
                 gp0.log_lh, gp1.log_lh, self.dtheta)
 
         diff = np.abs(jac - approx_jac)
-        bad = diff > self.thresh
+        thresh = 1e-5
+        bad = diff > thresh
         if bad.any():
-            print "threshold:", self.thresh
+            print "threshold:", thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print jac
@@ -85,9 +86,10 @@ class TestGP(object):
                 gp0.lh, gp1.lh, self.dtheta)
 
         diff = jac - approx_jac
-        bad = diff > self.thresh
+        thresh = 1e-5
+        bad = diff > thresh
         if bad.any():
-            print "threshold:", self.thresh
+            print "threshold:", thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print jac
@@ -113,9 +115,10 @@ class TestGP(object):
                 gp0.dlh_dtheta, gp1.dlh_dtheta, self.dtheta)
 
         diff = hess - approx_hess
-        bad = diff > self.thresh
+        thresh = 1e-4
+        bad = diff > thresh
         if bad.any():
-            print "threshold:", self.thresh
+            print "threshold:", thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print hess
