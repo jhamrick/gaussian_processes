@@ -1,3 +1,4 @@
+import traceback
 import numpy as np
 from numpy import dot
 np.seterr(all='raise')
@@ -57,10 +58,9 @@ class TestGP(object):
                 gp0.log_lh, gp1.log_lh, self.dtheta)
 
         diff = np.abs(jac - approx_jac)
-        thresh = 1e-5
-        bad = diff > thresh
+        bad = diff > self.thresh
         if bad.any():
-            print "threshold:", thresh
+            print "threshold:", self.thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print jac
@@ -86,10 +86,9 @@ class TestGP(object):
                 gp0.lh, gp1.lh, self.dtheta)
 
         diff = jac - approx_jac
-        thresh = 1e-5
-        bad = diff > thresh
+        bad = diff > self.thresh
         if bad.any():
-            print "threshold:", thresh
+            print "threshold:", self.thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print jac
@@ -115,10 +114,9 @@ class TestGP(object):
                 gp0.dlh_dtheta, gp1.dlh_dtheta, self.dtheta)
 
         diff = hess - approx_hess
-        thresh = 1e-4
-        bad = diff > thresh
+        bad = diff > self.thresh
         if bad.any():
-            print "threshold:", thresh
+            print "threshold:", self.thresh
             print "worst err:", diff.max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             print hess
@@ -129,40 +127,85 @@ class TestGP(object):
 
     def test_mean(self):
         x, y = make_xy()
+        failures = 0.
         for i in xrange(self.N_big):
             params = rand_params('h', 'w')
             s = 0
             gp = GP(kernel(*params), x, y, s=s)
-            yield self.check_mean, gp, y
+            try:
+                self.check_mean(gp, y)
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_big
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
 
     def test_inv(self):
         x, y = make_xy()
+        failures = 0.
         for i in xrange(self.N_small):
             params = rand_params('h', 'w')
             s = rand_params('s')
             gp = GP(kernel(*params), x, y, s=s)
-            yield self.check_inv, gp
+            try:
+                self.check_inv(gp)
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_small
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
 
     def test_dloglh(self):
         x, y = make_xy()
+        failures = 0.
         for i in xrange(self.N_big):
             params = rand_params('h', 'w')
             s = rand_params('s')
             gp = GP(kernel(*params), x, y, s=s)
-            yield self.check_dloglh, gp, params + (s,)
+            try:
+                self.check_dloglh(gp, params + (s,))
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_big
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
 
     def test_dlh(self):
         x, y = make_xy()
+        failures = 0.
         for i in xrange(self.N_big):
             params = rand_params('h', 'w')
             s = rand_params('s')
             gp = GP(kernel(*params), x, y, s=s)
-            yield self.check_dlh, gp, params + (s,)
+            try:
+                self.check_dlh(gp, params + (s,))
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_big
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
 
     def test_d2lh(self):
         x, y = make_xy()
+        failures = 0.
         for i in xrange(self.N_big):
             params = rand_params('h', 'w')
             s = rand_params('s')
             gp = GP(kernel(*params), x, y, s=s)
-            yield self.check_d2lh, gp, params + (s,)
+            try:
+                self.check_d2lh(gp, params + (s,))
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_big
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
