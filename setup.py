@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='gaussian_processes',
-    version='0.01',
+    version=open('VERSION.txt').read().strip(),
     description='Python library for gaussian processes',
     author='Jessica B. Hamrick',
     author_email='jhamrick@berkeley.edu',

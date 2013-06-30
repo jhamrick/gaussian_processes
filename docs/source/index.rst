@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to src's documentation!
-===============================
+.. include:: ../../README.rst
 
-Contents:
+Documentation
+-------------
 
 .. toctree::
    :maxdepth: 4
@@ -14,11 +14,9 @@ Contents:
    gp
    kernels
 
+Much of this code is based off of [RW06]_.
 
-Indices and tables
-==================
+.. rubric:: Bibliography
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+.. [RW06] Rasmussen, C. E., & Williams, C. K. I. (2006). Gaussian
+          processes for machine learning. MIT Press.
