@@ -27,7 +27,7 @@ class PeriodicKernel(Kernel):
 
     Notes
     -----
-    The periodic kernel is defined as:
+    The periodic kernel is defined by Equation 4.31 of [RW06]_:
 
     .. math:: K(x_1, x_2) = h^2\exp\left(\frac{-2\sin^2\left(\frac{x_1-x_2}{2p}\right)}{w^2}\right)
 
