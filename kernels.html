@@ -1,0 +1,563 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kernels Package &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="index.html" />
+    <link rel="prev" title="gp Module" href="gp.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.html" title="gp Module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="kernels-package">
+<h1>kernels Package<a class="headerlink" href="#kernels-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><a class="reference internal" href="#module-kernels" title="kernels"><tt class="xref py py-mod docutils literal"><span class="pre">kernels</span></tt></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-kernels"></span><dl class="class">
+<dt id="kernels.PeriodicKernel">
+<em class="property">class </em><tt class="descclassname">kernels.</tt><tt class="descname">PeriodicKernel</tt><big>(</big><em>h</em>, <em>w</em>, <em>p</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a periodic kernel function, of the form:</p>
+<blockquote>
+<div>$$k(x_1, x_2) = h^2exp(-</div></blockquote>
+<p>rac{2sin^2(
+rac{x_1-x_2}{2p})}{w^2})$$</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="kernels.PeriodicKernel.K">
+<tt class="descname">K</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dhdh">
+<tt class="descname">d2K_dhdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dhdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dhdp">
+<tt class="descname">d2K_dhdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dhdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dhdw">
+<tt class="descname">d2K_dhdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dhdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dpdh">
+<tt class="descname">d2K_dpdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dpdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dpdp">
+<tt class="descname">d2K_dpdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dpdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dpdw">
+<tt class="descname">d2K_dpdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dpdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dwdh">
+<tt class="descname">d2K_dwdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dwdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dwdp">
+<tt class="descname">d2K_dwdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dwdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.d2K_dwdw">
+<tt class="descname">d2K_dwdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.d2K_dwdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.dK_dh">
+<tt class="descname">dK_dh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.dK_dh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.dK_dp">
+<tt class="descname">dK_dp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.dK_dp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.dK_dw">
+<tt class="descname">dK_dw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.dK_dw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.PeriodicKernel.h">
+<tt class="descname">h</tt><a class="headerlink" href="#kernels.PeriodicKernel.h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.hessian">
+<tt class="descname">hessian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.hessian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.PeriodicKernel.jacobian">
+<tt class="descname">jacobian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.PeriodicKernel.jacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.PeriodicKernel.p">
+<tt class="descname">p</tt><a class="headerlink" href="#kernels.PeriodicKernel.p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.PeriodicKernel.params">
+<tt class="descname">params</tt><a class="headerlink" href="#kernels.PeriodicKernel.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.PeriodicKernel.sym_K">
+<tt class="descname">sym_K</tt><a class="headerlink" href="#kernels.PeriodicKernel.sym_K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.PeriodicKernel.w">
+<tt class="descname">w</tt><a class="headerlink" href="#kernels.PeriodicKernel.w" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kernels.GaussianKernel">
+<em class="property">class </em><tt class="descclassname">kernels.</tt><tt class="descname">GaussianKernel</tt><big>(</big><em>h</em>, <em>w</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a gaussian kernel function, of the form:</p>
+<blockquote>
+<div>$$k(x_1, x_2) = h^2</div></blockquote>
+<p>rac{1}{sqrt{2pi w^2}}exp(-
+rac{(x_1-x_2)^2}{2w^2})$$</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="kernels.GaussianKernel.K">
+<tt class="descname">K</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.d2K_dhdh">
+<tt class="descname">d2K_dhdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.d2K_dhdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.d2K_dhdw">
+<tt class="descname">d2K_dhdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.d2K_dhdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.d2K_dwdh">
+<tt class="descname">d2K_dwdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.d2K_dwdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.d2K_dwdw">
+<tt class="descname">d2K_dwdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.d2K_dwdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.dK_dh">
+<tt class="descname">dK_dh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.dK_dh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.dK_dw">
+<tt class="descname">dK_dw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.dK_dw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.GaussianKernel.h">
+<tt class="descname">h</tt><a class="headerlink" href="#kernels.GaussianKernel.h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.hessian">
+<tt class="descname">hessian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.hessian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.GaussianKernel.jacobian">
+<tt class="descname">jacobian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.GaussianKernel.jacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.GaussianKernel.params">
+<tt class="descname">params</tt><a class="headerlink" href="#kernels.GaussianKernel.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.GaussianKernel.sym_K">
+<tt class="descname">sym_K</tt><a class="headerlink" href="#kernels.GaussianKernel.sym_K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.GaussianKernel.w">
+<tt class="descname">w</tt><a class="headerlink" href="#kernels.GaussianKernel.w" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kernels.base_kernel">
+<span id="base-kernel-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">base_kernel</span></tt> Module<a class="headerlink" href="#module-kernels.base_kernel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kernels.base_kernel.BaseKernel">
+<em class="property">class </em><tt class="descclassname">kernels.base_kernel.</tt><tt class="descname">BaseKernel</tt><a class="reference internal" href="_modules/kernels/base_kernel.html#BaseKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.base_kernel.BaseKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">type</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kernels.base_kernel.lazyjit">
+<tt class="descclassname">kernels.base_kernel.</tt><tt class="descname">lazyjit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/kernels/base_kernel.html#lazyjit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.base_kernel.lazyjit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kernels.base_kernel.selfparams">
+<tt class="descclassname">kernels.base_kernel.</tt><tt class="descname">selfparams</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="_modules/kernels/base_kernel.html#selfparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.base_kernel.selfparams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kernels.gaussian_kernel">
+<span id="gaussian-kernel-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">gaussian_kernel</span></tt> Module<a class="headerlink" href="#module-kernels.gaussian_kernel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kernels.gaussian_kernel.GaussianKernel">
+<em class="property">class </em><tt class="descclassname">kernels.gaussian_kernel.</tt><tt class="descname">GaussianKernel</tt><big>(</big><em>h</em>, <em>w</em><big>)</big><a class="reference internal" href="_modules/kernels/gaussian_kernel.html#GaussianKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a gaussian kernel function, of the form:</p>
+<blockquote>
+<div>$$k(x_1, x_2) = h^2</div></blockquote>
+<p>rac{1}{sqrt{2pi w^2}}exp(-
+rac{(x_1-x_2)^2}{2w^2})$$</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.K">
+<tt class="descname">K</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/kernels/gaussian_kernel.html#GaussianKernel.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.d2K_dhdh">
+<tt class="descname">d2K_dhdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.d2K_dhdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.d2K_dhdw">
+<tt class="descname">d2K_dhdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.d2K_dhdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.d2K_dwdh">
+<tt class="descname">d2K_dwdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.d2K_dwdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.d2K_dwdw">
+<tt class="descname">d2K_dwdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.d2K_dwdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.dK_dh">
+<tt class="descname">dK_dh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.dK_dh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.dK_dw">
+<tt class="descname">dK_dw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.dK_dw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.gaussian_kernel.GaussianKernel.h">
+<tt class="descname">h</tt><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.hessian">
+<tt class="descname">hessian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.hessian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.gaussian_kernel.GaussianKernel.jacobian">
+<tt class="descname">jacobian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.jacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.gaussian_kernel.GaussianKernel.params">
+<tt class="descname">params</tt><a class="reference internal" href="_modules/kernels/gaussian_kernel.html#GaussianKernel.params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.gaussian_kernel.GaussianKernel.sym_K">
+<tt class="descname">sym_K</tt><a class="reference internal" href="_modules/kernels/gaussian_kernel.html#GaussianKernel.sym_K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.sym_K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.gaussian_kernel.GaussianKernel.w">
+<tt class="descname">w</tt><a class="headerlink" href="#kernels.gaussian_kernel.GaussianKernel.w" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kernels.periodic_kernel">
+<span id="periodic-kernel-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">periodic_kernel</span></tt> Module<a class="headerlink" href="#module-kernels.periodic_kernel" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kernels.periodic_kernel.PeriodicKernel">
+<em class="property">class </em><tt class="descclassname">kernels.periodic_kernel.</tt><tt class="descname">PeriodicKernel</tt><big>(</big><em>h</em>, <em>w</em>, <em>p</em><big>)</big><a class="reference internal" href="_modules/kernels/periodic_kernel.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a periodic kernel function, of the form:</p>
+<blockquote>
+<div>$$k(x_1, x_2) = h^2exp(-</div></blockquote>
+<p>rac{2sin^2(
+rac{x_1-x_2}{2p})}{w^2})$$</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.K">
+<tt class="descname">K</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/kernels/periodic_kernel.html#PeriodicKernel.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dhdh">
+<tt class="descname">d2K_dhdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dhdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dhdp">
+<tt class="descname">d2K_dhdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dhdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dhdw">
+<tt class="descname">d2K_dhdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dhdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dpdh">
+<tt class="descname">d2K_dpdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dpdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dpdp">
+<tt class="descname">d2K_dpdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dpdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dpdw">
+<tt class="descname">d2K_dpdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dpdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dwdh">
+<tt class="descname">d2K_dwdh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dwdh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dwdp">
+<tt class="descname">d2K_dwdp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dwdp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.d2K_dwdw">
+<tt class="descname">d2K_dwdw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.d2K_dwdw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.dK_dh">
+<tt class="descname">dK_dh</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.dK_dh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.dK_dp">
+<tt class="descname">dK_dp</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.dK_dp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.dK_dw">
+<tt class="descname">dK_dw</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.dK_dw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.periodic_kernel.PeriodicKernel.h">
+<tt class="descname">h</tt><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.hessian">
+<tt class="descname">hessian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.hessian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kernels.periodic_kernel.PeriodicKernel.jacobian">
+<tt class="descname">jacobian</tt><big>(</big><em>obj</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.jacobian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.periodic_kernel.PeriodicKernel.p">
+<tt class="descname">p</tt><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.p" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.periodic_kernel.PeriodicKernel.params">
+<tt class="descname">params</tt><a class="reference internal" href="_modules/kernels/periodic_kernel.html#PeriodicKernel.params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.periodic_kernel.PeriodicKernel.sym_K">
+<tt class="descname">sym_K</tt><a class="reference internal" href="_modules/kernels/periodic_kernel.html#PeriodicKernel.sym_K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.sym_K" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kernels.periodic_kernel.PeriodicKernel.w">
+<tt class="descname">w</tt><a class="headerlink" href="#kernels.periodic_kernel.PeriodicKernel.w" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">kernels Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">kernels</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-kernels.base_kernel"><tt class="docutils literal"><span class="pre">base_kernel</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-kernels.gaussian_kernel"><tt class="docutils literal"><span class="pre">gaussian_kernel</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-kernels.periodic_kernel"><tt class="docutils literal"><span class="pre">periodic_kernel</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gp.html"
+                        title="previous chapter">gp Module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/kernels.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.html" title="gp Module"
+             >previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jessica B. Hamrick.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp Module &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="index.html" />
+    <link rel="next" title="kernels Package" href="kernels.html" />
+    <link rel="prev" title="Welcome to src’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="kernels.html" title="kernels Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to src’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gp">
+<span id="gp-module"></span><h1>gp Module<a class="headerlink" href="#module-gp" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gp.GP">
+<em class="property">class </em><tt class="descclassname">gp.</tt><tt class="descname">GP</tt><big>(</big><em>K</em>, <em>x</em>, <em>y</em>, <em>s=0</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Gaussian Process object.</p>
+<dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+<dl class="method">
+<dt id="gp.GP.Kxox">
+<tt class="descname">Kxox</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.Kxox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.Kxox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix/vector between given points x and
+new points xo:</p>
+<p>K(xo, x)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.GP.Kxoxo">
+<tt class="descname">Kxoxo</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.Kxoxo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.Kxoxo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix of new sample points xo:</p>
+<p>K(xo, xo&#8217;)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.Kxx">
+<tt class="descname">Kxx</tt><a class="reference internal" href="_modules/gp.html#GP.Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.Kxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The kernel covariance matrix:</p>
+<p>$$K_{xx} = K(x, x&#8217;) + s^2delta(x-x&#8217;),$$</p>
+<p>where $delta$ is the Dirac delta function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.GP.Kxxo">
+<tt class="descname">Kxxo</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.Kxxo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.Kxxo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix/vector between given points x and
+new points xo:</p>
+<p>K(x, xo)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.Lxx">
+<tt class="descname">Lxx</tt><a class="reference internal" href="_modules/gp.html#GP.Lxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.Lxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cholesky decomposition of K(x, x&#8217;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.GP.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/gp.html#GP.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.copy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.GP.cov">
+<tt class="descname">cov</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictive covariance of the GP.</p>
+<p>This is computing Eq. 2.24 of Rasmussen &amp; Williams (2006):</p>
+<p>$$mathbf{C}=K(X_*, X_*) - K(X_*, X)[K(X, X) + sigma_n^2]^{-1}K(X, X_*)$$</p>
+<dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.d2lh_dtheta2">
+<tt class="descname">d2lh_dtheta2</tt><a class="reference internal" href="_modules/gp.html#GP.d2lh_dtheta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.d2lh_dtheta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>The second partial derivatives of the marginal likelihood
+with respect to its parameters `        heta`.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.dlh_dtheta">
+<tt class="descname">dlh_dtheta</tt><a class="reference internal" href="_modules/gp.html#GP.dlh_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.dlh_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partial derivatives of the marginal likelihood with
+respect to its parameters `     heta`.</p>
+<p>See Eq. 5.9 of Rasmussen &amp; Williams (2006).</p>
+<dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.dloglh_dtheta">
+<tt class="descname">dloglh_dtheta</tt><a class="reference internal" href="_modules/gp.html#GP.dloglh_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.dloglh_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partial derivatives of the marginal log likelihood with
+respect to its parameters `     heta`.</p>
+<p>See Eq. 5.9 of Rasmussen &amp; Williams (2006).</p>
+<dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.inv_Kxx">
+<tt class="descname">inv_Kxx</tt><a class="reference internal" href="_modules/gp.html#GP.inv_Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.inv_Kxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse of K(x, x&#8217;)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.inv_Kxx_y">
+<tt class="descname">inv_Kxx_y</tt><a class="reference internal" href="_modules/gp.html#GP.inv_Kxx_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.inv_Kxx_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dot product of inv(K(x, x&#8217;)) and y</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.inv_Lxx">
+<tt class="descname">inv_Lxx</tt><a class="reference internal" href="_modules/gp.html#GP.inv_Lxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.inv_Lxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse cholesky decomposition of K(x, x&#8217;)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.lh">
+<tt class="descname">lh</tt><a class="reference internal" href="_modules/gp.html#GP.lh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.lh" title="Permalink to this definition">¶</a></dt>
+<dd><p>The likelihood of y given x and theta. See GP.log_lh</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.log_lh">
+<tt class="descname">log_lh</tt><a class="reference internal" href="_modules/gp.html#GP.log_lh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.log_lh" title="Permalink to this definition">¶</a></dt>
+<dd><p>The log likelihood of y given x and theta.</p>
+<blockquote>
+<div><p>This is computing Eq. 5.8 of Rasmussen &amp; Williams (2006):</p>
+<p>$$log{p(mathbf{y} | X mathbf{        heta})} = -</p>
+</div></blockquote>
+<p>rac{1}{2}mathbf{y}^        op K_y^{-1}mathbf{y} - 
+rac{1}{2}log{<a href="#id1"><span class="problematic" id="id2">|K_y|</span></a>}-
+rac{n}{2}log{2pi}$$</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.GP.mean">
+<tt class="descname">mean</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictive mean of the GP.</p>
+<p>This is computing Eq. 2.23 of Rasmussen &amp; Williams (2006):</p>
+<p>$$mathbf{m}=K(X_*, X)[K(X, X) + sigma_n^2]^{-1}mathbf{y}$$</p>
+<dl class="docutils">
+<dt>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</dt>
+<dd>for machine learning. MIT Press.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.params">
+<tt class="descname">params</tt><a class="reference internal" href="_modules/gp.html#GP.params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel parameters.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.s">
+<tt class="descname">s</tt><a class="reference internal" href="_modules/gp.html#GP.s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Observation noise parameter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.x">
+<tt class="descname">x</tt><a class="reference internal" href="_modules/gp.html#GP.x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector of input points.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.GP.y">
+<tt class="descname">y</tt><a class="reference internal" href="_modules/gp.html#GP.y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector of input observations.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to src&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="kernels.html"
+                        title="next chapter">kernels Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/gp.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="kernels.html" title="kernels Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to src’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jessica B. Hamrick.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
