@@ -1,5 +1,5 @@
 PYCMD=python setup.py
-GH_PAGES_SOURCES=src docs Makefile
+GH_PAGES_SOURCES=src docs VERSION.txt README.md Makefile
 
 all:
 	$(PYCMD) bdist
@@ -28,11 +28,12 @@ gh-pages:
 	rm -rf _sources _static
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
+        pandoc --from markdown --to rst -o README.rst README.md
 	cd docs
 	make html
 	mv -fv _build/html/* ../
 	cd ../
-	rm -rf $(GH_PAGES_SOURCES)
+	rm -rf $(GH_PAGES_SOURCES) README.rst
 	git add -A
 	git ci -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages
 	git checkout master
