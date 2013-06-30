@@ -1,5 +1,5 @@
-gp Module
-=========
+Gaussian process module
+=======================
 
 .. automodule:: gp
     :members:
