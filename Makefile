@@ -28,7 +28,7 @@ gh-pages:
 	rm -rf _sources _static
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
-        pandoc --from markdown --to rst -o README.rst README.md
+	pandoc --from markdown --to rst -o README.rst README.md
 	cd docs
 	make html
 	mv -fv _build/html/* ../
