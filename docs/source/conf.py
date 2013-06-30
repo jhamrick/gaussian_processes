@@ -71,7 +71,7 @@ release = ''
 exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-#default_role = None
+default_role = 'py:obj'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = False
@@ -312,7 +312,7 @@ epub_copyright = u'2013, Jessica B. Hamrick'
 # -- Options for autodoc ---------------------------------------------
 
 autoclass_content = 'class'
-autodoc_member_order = 'bysource'
+autodoc_member_order = 'alphabetical'
 autodoc_default_flags = ['members',
                          'undoc-members',
                          'inherited-members',

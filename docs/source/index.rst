@@ -16,5 +16,5 @@ Much of this code is based off of [RW06]_.
 
 .. rubric:: Bibliography
 
-.. [RW06] Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-          processes for machine learning.` MIT Press.
+.. [RW06] Rasmussen, C. E., & Williams, C. K. I. (2006). Gaussian
+          processes for machine learning. MIT Press.

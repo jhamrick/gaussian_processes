@@ -22,4 +22,4 @@ Kernel specification
     kernels.base.KernelMeta
 
 .. autofunction:: kernels.util.lazyjit
-
+.. autofunction:: kernels.util.staticlazyjit
