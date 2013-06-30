@@ -11,6 +11,7 @@ setup(
     url='https://github.com/jhamrick/gaussian_processes',
     packages=['kernels'],
     py_modules=['gp'],
+    package_dir={'': 'src'},
     keywords='gp kernel statistics',
     classifiers=[
         "Development Status :: 3 - Alpha",
