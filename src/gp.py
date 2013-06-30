@@ -34,9 +34,8 @@ class GP(object):
 
     Parameters
     ----------
-    K : function
-        Kernel function, which takes two vectors as input and returns
-        their inner product.
+    K : :class:`kernels.Kernel`
+        Kernel object
     x : numpy.ndarray
         :math:`n\times d` array of input locations
     y : numpy.ndarray
@@ -46,8 +45,8 @@ class GP(object):
 
     References
     ----------
-    Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian processes
-    for machine learning.` MIT Press.
+    * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
+      processes for machine learning.` MIT Press.
 
     """
 
@@ -55,21 +54,13 @@ class GP(object):
         r"""
         Initialize the GP.
 
-        Parameters
-        ----------
-        K : function
-            Kernel function, which takes two vectors as input and returns
-            their inner product.
-        x : numpy.ndarray
-            :math:`n\times d` array of input locations
-        y : numpy.ndarray
-            :math:`n\times 1` array of input observations
-        s : number (default=0)
-            Observation noise parameter
-
         """
         self._memoized = {}
+
+        #: Kernel for the gaussian process, of type
+        #: :class:`kernels.Kernel`
         self.K = K
+
         self.x = x
         self.y = y
         self.s = s
@@ -267,8 +258,8 @@ class GP(object):
 
         References
         ----------
-        Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian processes
-        for machine learning.` MIT Press.
+        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
+          processes for machine learning.` MIT Press.
 
         """
         y, K = self._y, self.Kxx
@@ -327,8 +318,8 @@ class GP(object):
 
         References
         ----------
-        Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian processes
-        for machine learning.` MIT Press.
+        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
+          processes for machine learning.` MIT Press.
 
         """
 
@@ -521,8 +512,8 @@ class GP(object):
 
         References
         ----------
-        Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian processes
-        for machine learning.` MIT Press.
+        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
+          processes for machine learning.` MIT Press.
 
         """
         return np.dot(self.Kxox(xo), self.inv_Kxx_y)
@@ -548,8 +539,8 @@ class GP(object):
 
         References
         ----------
-        Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian processes
-        for machine learning.` MIT Press.
+        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
+          processes for machine learning.` MIT Press.
 
         """
         Kxoxo = self.Kxoxo(xo)
