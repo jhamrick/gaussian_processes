@@ -1,35 +1,25 @@
-kernels Package
-===============
+Kernels
+=======
 
-:mod:`kernels` Package
-----------------------
+.. module:: kernels
 
-.. automodule:: kernels
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Supported kernels
+-----------------
 
-:mod:`base_kernel` Module
--------------------------
+.. toctree::
+    :maxdepth: 1
+    
+    kernels.GaussianKernel
+    kernels.PeriodicKernel
 
-.. automodule:: kernels.base_kernel
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Kernel specification
+--------------------
 
-:mod:`gaussian_kernel` Module
------------------------------
+.. toctree::
+    :maxdepth: 1
 
-.. automodule:: kernels.gaussian_kernel
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    kernels.Kernel
+    kernels.base.KernelMeta
 
-:mod:`periodic_kernel` Module
------------------------------
-
-.. automodule:: kernels.periodic_kernel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+.. autofunction:: kernels.util.lazyjit
+.. autofunction:: kernels.util.staticlazyjit

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gp &mdash; src  documentation</title>
+    <title>gp &mdash; gaussian_processes 0.01.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '',
+        VERSION:     '0.01.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,8 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="src  documentation" href="../index.html" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 0.01.2 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +37,10 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">src  documentation</a> &raquo;</li>
+        <li class="right" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -54,7 +58,8 @@
 
 
 <span class="k">def</span> <span class="nf">memoprop</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Memoized property.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Memoized property.</span>
 
 <span class="sd">    When the property is accessed for the first time, the return value</span>
 <span class="sd">    is stored and that value is given on subsequent calls. The memoized</span>
@@ -77,45 +82,49 @@
 
 
 <div class="viewcode-block" id="GP"><a class="viewcode-back" href="../gp.html#gp.GP">[docs]</a><span class="k">class</span> <span class="nc">GP</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Gaussian Process object.</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian Process object.</span>
 
-<span class="sd">    References</span>
+<span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</span>
-<span class="sd">        for machine learning. MIT Press.</span>
+<span class="sd">    K : :class:`kernels.Kernel`</span>
+<span class="sd">        Kernel object</span>
+<span class="sd">    x : numpy.ndarray</span>
+<span class="sd">        :math:`n\times d` array of input locations</span>
+<span class="sd">    y : numpy.ndarray</span>
+<span class="sd">        :math:`n\times 1` array of input observations</span>
+<span class="sd">    s : number (default=0)</span>
+<span class="sd">        Standard deviation of observation noise</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Initialize the GP.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        K : function</span>
-<span class="sd">            Kernel function, which takes two vectors as input and returns</span>
-<span class="sd">            their inner product.</span>
-<span class="sd">        x : numpy.ndarray</span>
-<span class="sd">            Vector of input points</span>
-<span class="sd">        y : numpy.ndarray</span>
-<span class="sd">            Vector of input observations</span>
-<span class="sd">        s : number (default=0)</span>
-<span class="sd">            Observation noise parameter</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the GP.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c">#: Kernel for the gaussian process, of type</span>
+        <span class="c">#: :class:`kernels.Kernel`</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
 
-<div class="viewcode-block" id="GP.copy"><a class="viewcode-back" href="../gp.html#gp.GP.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">new_gp</span> <span class="o">=</span> <span class="n">GP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
-        <span class="n">new_gp</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new_gp</span>
-</div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vector of input points.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Vector of input locations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x : numpy.ndarray</span>
+<span class="sd">            :math:`n\times d` array, where :math:`n` is the number of</span>
+<span class="sd">            locations and :math:`d` is the number of dimensions.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
 
     <span class="nd">@x.setter</span>
@@ -126,7 +135,16 @@
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vector of input observations.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Vector of input observations.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        y : numpy.ndarray</span>
+<span class="sd">            :math:`n\times 1` array, where :math:`n` is the number of</span>
+<span class="sd">            observations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
 
     <span class="nd">@y.setter</span>
@@ -137,7 +155,15 @@
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Observation noise parameter.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Standard deviation of the observation noise for the gaussian</span>
+<span class="sd">        process.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s : float</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span>
 
     <span class="nd">@s.setter</span>
@@ -147,7 +173,16 @@
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kernel parameters.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Gaussian process parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : tuple</span>
+<span class="sd">           Consists of the kernel&#39;s parameters, `self.K.params`, and the</span>
+<span class="sd">           observation noise parameter, :math:`s`, in that order.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">params</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">])</span>
 
     <span class="nd">@params.setter</span>
@@ -159,13 +194,39 @@
         <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </div>
+<div class="viewcode-block" id="GP.copy"><a class="viewcode-back" href="../gp.html#gp.GP.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a copy of the gaussian process object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        gp : :class:`gp.GP`</span>
+<span class="sd">            New gaussian process object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_gp</span> <span class="o">=</span> <span class="n">GP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">new_gp</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_gp</span>
+</div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.Kxx"><a class="viewcode-back" href="../gp.html#gp.GP.Kxx">[docs]</a>    <span class="k">def</span> <span class="nf">Kxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The kernel covariance matrix:</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel covariance matrix :math:`\mathbf{K}_{xx}`.</span>
 
-<span class="sd">        $$K_{xx} = K(x, x&#39;) + s^2\delta(x-x&#39;),$$</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Kxx : numpy.ndarray</span>
+<span class="sd">            :math:`n\times n` covariance matrix</span>
 
-<span class="sd">        where $\delta$ is the Dirac delta function.</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The entry at index :math:`(i, j)` is defined as:</span>
+
+<span class="sd">        .. math:: K_{x_ix_j} = K(x_i, x_j) + s^2\delta(x_i-x_j),</span>
+
+<span class="sd">        where :math:`K(\cdot{})` is the kernel function, :math:`s` is the</span>
+<span class="sd">        standard deviation of the observation noise, and :math:`\delta`</span>
+<span class="sd">        is the Dirac delta function.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span>
@@ -178,32 +239,94 @@
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.Lxx"><a class="viewcode-back" href="../gp.html#gp.GP.Lxx">[docs]</a>    <span class="k">def</span> <span class="nf">Lxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cholesky decomposition of K(x, x&#39;)&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Cholesky decomposition of the kernel covariance matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Lxx : numpy.ndarray</span>
+<span class="sd">            :math:`n\times n` lower triangular matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value is :math:`\mathbf{L}_{xx}`, such that</span>
+<span class="sd">        :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kxx</span><span class="p">)</span>
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.inv_Lxx"><a class="viewcode-back" href="../gp.html#gp.GP.inv_Lxx">[docs]</a>    <span class="k">def</span> <span class="nf">inv_Lxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Inverse cholesky decomposition of K(x, x&#39;)&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Inverse cholesky decomposition of the kernel covariance matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inv_Lxx : numpy.ndarray</span>
+<span class="sd">            :math:`n\times n` matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The value is :math:`\mathbf{L}_{xx}^{-1}`, such that:</span>
+
+<span class="sd">        .. math:: \mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Lxx</span><span class="p">)</span>
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.inv_Kxx"><a class="viewcode-back" href="../gp.html#gp.GP.inv_Kxx">[docs]</a>    <span class="k">def</span> <span class="nf">inv_Kxx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Inverse of K(x, x&#39;)&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Inverse kernel covariance matrix, :math:`\mathbf{K}_{xx}^{-1}`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inv_Kxx : numpy.ndarray</span>
+<span class="sd">            :math:`n\times n` matrix</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Li</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Lxx</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Li</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Li</span><span class="p">)</span>
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.inv_Kxx_y"><a class="viewcode-back" href="../gp.html#gp.GP.inv_Kxx_y">[docs]</a>    <span class="k">def</span> <span class="nf">inv_Kxx_y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Dot product of inv(K(x, x&#39;)) and y&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Dot product of the inverse kernel covariance matrix and of</span>
+<span class="sd">        observation vector.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        inv_Kxx_y : numpy.ndarray</span>
+<span class="sd">            :math:`n\times 1` array</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined as :math:`\mathbf{K}_{xx}^{-1}\mathbf{y}`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">)</span>
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.log_lh"><a class="viewcode-back" href="../gp.html#gp.GP.log_lh">[docs]</a>    <span class="k">def</span> <span class="nf">log_lh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The log likelihood of y given x and theta.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Marginal log likelihood.</span>
 
-<span class="sd">        This is computing Eq. 5.8 of Rasmussen &amp; Williams (2006):</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        log_lh : float</span>
+<span class="sd">            Marginal log likelihood</span>
 
-<span class="sd">        $$\log{p(\mathbf{y} | X \mathbf{\theta})} = -\frac{1}{2}\mathbf{y}^\top K_y^{-1}\mathbf{y} - \frac{1}{2}\log{|K_y|}-\frac{n}{2}\log{2\pi}$$</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is the log likelihood of observations :math:`\mathbf{y}`</span>
+<span class="sd">        given locations :math:`\mathbf{x}` and kernel parameters</span>
+<span class="sd">        :math:`\theta`. It is defined by Eq. 5.8 of [RW06]_:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \log{p(\mathbf{y} | \mathbf{x}, \mathbf{\theta})} = -\frac{1}{2}\mathbf{y}^\top \mathbf{K}_{xx}^{-1}\mathbf{y} - \frac{1}{2}\log{\left|\mathbf{K}_{xx}\right|}-\frac{d}{2}\log{2\pi},</span>
+
+<span class="sd">        where :math:`d` is the dimensionality of :math:`\mathbf{x}`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx</span>
@@ -221,22 +344,52 @@
         <span class="n">llh</span> <span class="o">=</span> <span class="n">data_fit</span> <span class="o">+</span> <span class="n">complexity_penalty</span> <span class="o">+</span> <span class="n">constant</span>
         <span class="k">return</span> <span class="n">llh</span>
 </div>
-    <span class="nd">@property</span>
+    <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.lh"><a class="viewcode-back" href="../gp.html#gp.GP.lh">[docs]</a>    <span class="k">def</span> <span class="nf">lh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The likelihood of y given x and theta. See GP.log_lh&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Marginal likelihood.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        lh : float</span>
+<span class="sd">            Marginal likelihood</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is the likelihood of observations :math:`\mathbf{y}` given</span>
+<span class="sd">        locations :math:`\mathbf{x}` and kernel parameters</span>
+<span class="sd">        :math:`\theta`. It is defined as:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            p(\mathbf{y} | \mathbf{x}, \mathbf{\theta}) = \left(2\pi\right)^{-\frac{d}{2}}\left|\mathbf{K}_{xx}\right|^{-\frac{1}{2}}\exp\left(-\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\mathbf{y}\right)</span>
+
+<span class="sd">        where :math:`d` is the dimensionality of :math:`\mathbf{x}`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_lh</span><span class="p">)</span>
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.dloglh_dtheta"><a class="viewcode-back" href="../gp.html#gp.GP.dloglh_dtheta">[docs]</a>    <span class="k">def</span> <span class="nf">dloglh_dtheta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The partial derivatives of the marginal log likelihood with</span>
-<span class="sd">        respect to its parameters `\theta`.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Derivative of the marginal log likelihood.</span>
 
-<span class="sd">        See Eq. 5.9 of Rasmussen &amp; Williams (2006).</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dloglh_dtheta : numpy.ndarray</span>
+<span class="sd">            :math:`n_\theta`-length vector of derivatives, where</span>
+<span class="sd">            :math:`n_\theta` is the number of parameters (equivalent to</span>
+<span class="sd">            ``len(self.params)``).</span>
 
-<span class="sd">        References</span>
-<span class="sd">        ----------</span>
-<span class="sd">        Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</span>
-<span class="sd">            for machine learning. MIT Press.</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is a vector of first partial derivatives of the log</span>
+<span class="sd">        likelihood with respect to its parameters :math:`\theta`. It is</span>
+<span class="sd">        defined by Equation 5.9 of [RW06]_:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \frac{\partial}{\partial\theta_i}\log{p(\mathbf{y}|\mathbf{x},\theta)}=\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}-\frac{1}{2}\mathbf{tr}\left(\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\right)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -264,15 +417,20 @@
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.dlh_dtheta"><a class="viewcode-back" href="../gp.html#gp.GP.dlh_dtheta">[docs]</a>    <span class="k">def</span> <span class="nf">dlh_dtheta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The partial derivatives of the marginal likelihood with</span>
-<span class="sd">        respect to its parameters `\theta`.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Derivative of the marginal likelihood.</span>
 
-<span class="sd">        See Eq. 5.9 of Rasmussen &amp; Williams (2006).</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dlh_dtheta : numpy.ndarray</span>
+<span class="sd">            :math:`n_\theta`-length vector of derivatives, where</span>
+<span class="sd">            :math:`n_\theta` is the number of parameters (equivalent to</span>
+<span class="sd">            ``len(self.params)``).</span>
 
-<span class="sd">        References</span>
-<span class="sd">        ----------</span>
-<span class="sd">        Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</span>
-<span class="sd">            for machine learning. MIT Press.</span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is a vector of first partial derivatives of the likelihood</span>
+<span class="sd">        with respect to its parameters :math:`\theta`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -296,8 +454,20 @@
 </div>
     <span class="nd">@memoprop</span>
 <div class="viewcode-block" id="GP.d2lh_dtheta2"><a class="viewcode-back" href="../gp.html#gp.GP.d2lh_dtheta2">[docs]</a>    <span class="k">def</span> <span class="nf">d2lh_dtheta2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The second partial derivatives of the marginal likelihood</span>
-<span class="sd">        with respect to its parameters `\theta`.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Second derivative of the marginal likelihood.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        d2lh_dtheta2 : numpy.ndarray</span>
+<span class="sd">            :math:`n_\theta`-length vector of derivatives, where</span>
+<span class="sd">            :math:`n_\theta` is the number of parameters (equivalent to</span>
+<span class="sd">            ``len(self.params)``).</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is a matrix of second partial derivatives of the likelihood</span>
+<span class="sd">        with respect to its parameters :math:`\theta`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -342,57 +512,121 @@
         <span class="k">return</span> <span class="n">d2lh</span>
 </div>
 <div class="viewcode-block" id="GP.Kxoxo"><a class="viewcode-back" href="../gp.html#gp.GP.Kxoxo">[docs]</a>    <span class="k">def</span> <span class="nf">Kxoxo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kernel covariance matrix of new sample points xo:</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel covariance matrix of new sample locations.</span>
 
-<span class="sd">        K(xo, xo&#39;)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of new sample locations</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Kxoxo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times m` covariance matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined as :math:`K(\mathbf{x^*}, \mathbf{x^*})`, where</span>
+<span class="sd">        :math:`\mathbf{x^*}` are the new locations.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">xo</span><span class="p">,</span> <span class="n">xo</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="GP.Kxxo"><a class="viewcode-back" href="../gp.html#gp.GP.Kxxo">[docs]</a>    <span class="k">def</span> <span class="nf">Kxxo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kernel covariance matrix/vector between given points x and</span>
-<span class="sd">        new points xo:</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel covariance matrix between given locations and new sample</span>
+<span class="sd">        locations.</span>
 
-<span class="sd">        K(x, xo)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of new sample locations</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Kxxo : numpy.ndarray</span>
+<span class="sd">            :math:`n\times m` covariance matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined as :math:`K(\mathbf{x},\mathbf{x^*})`, where</span>
+<span class="sd">        :math:`\mathbf{x}` are the given locations and</span>
+<span class="sd">        :math:`\mathbf{x^*}` are the new sample locations.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="n">xo</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="GP.Kxox"><a class="viewcode-back" href="../gp.html#gp.GP.Kxox">[docs]</a>    <span class="k">def</span> <span class="nf">Kxox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Kernel covariance matrix/vector between given points x and</span>
-<span class="sd">        new points xo:</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel covariance matrix between new sample locations and given</span>
+<span class="sd">        locations.</span>
 
-<span class="sd">        K(xo, x)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        xo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of new sample locations</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Kxox : numpy.ndarray</span>
+<span class="sd">            :math:`m\times n` covariance matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined as :math:`K(\mathbf{x^*},\mathbf{x})`, where</span>
+<span class="sd">        :math:`\mathbf{x^*}` are the new sample locations and</span>
+<span class="sd">        :math:`\mathbf{x}` are the given locations</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">xo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="GP.mean"><a class="viewcode-back" href="../gp.html#gp.GP.mean">[docs]</a>    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Predictive mean of the GP.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Predictive mean of the gaussian process.</span>
 
-<span class="sd">        This is computing Eq. 2.23 of Rasmussen &amp; Williams (2006):</span>
-
-<span class="sd">        $$\mathbf{m}=K(X_*, X)[K(X, X) + \sigma_n^2]^{-1}\mathbf{y}$$</span>
-
-<span class="sd">        References</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</span>
-<span class="sd">            for machine learning. MIT Press.</span>
+<span class="sd">        xo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of new sample locations</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mean : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of predictive means</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined by Equation 2.23 of [RW06]_:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \mathbf{m}(\mathbf{x^*})=K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\mathbf{y}</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kxox</span><span class="p">(</span><span class="n">xo</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="GP.cov"><a class="viewcode-back" href="../gp.html#gp.GP.cov">[docs]</a>    <span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xo</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Predictive covariance of the GP.</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Predictive covariance of the gaussian process.</span>
 
-<span class="sd">        This is computing Eq. 2.24 of Rasmussen &amp; Williams (2006):</span>
-
-<span class="sd">        $$\mathbf{C}=K(X_*, X_*) - K(X_*, X)[K(X, X) + \sigma_n^2]^{-1}K(X, X_*)$$</span>
-
-<span class="sd">        References</span>
+<span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian processes</span>
-<span class="sd">            for machine learning. MIT Press.</span>
+<span class="sd">        xo : numpy.ndarray</span>
+<span class="sd">            :math:`m\times d` array of new sample locations</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cov : numpy.ndarray</span>
+<span class="sd">            :math:`m\times m` array of predictive covariances</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is defined by Eq. 2.24 of [RW06]_:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            \mathbf{C}=K(\mathbf{x^*}, \mathbf{x^*}) - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}K(\mathbf{x}, \mathbf{x^*})</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Kxoxo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxoxo</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span>
@@ -432,7 +666,10 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">src  documentation</a> &raquo;</li>
+        <li class="right" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

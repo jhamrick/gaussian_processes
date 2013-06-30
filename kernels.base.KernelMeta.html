@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Kernels &mdash; gaussian_processes 0.01.2 documentation</title>
+    <title>Kernel metaclass &mdash; gaussian_processes 0.01.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="gaussian_processes 0.01.2 documentation" href="index.html" />
-    <link rel="next" title="Gaussian kernel" href="kernels.GaussianKernel.html" />
-    <link rel="prev" title="Gaussian process module" href="gp.html" /> 
+    <link rel="up" title="Kernels" href="kernels.html" />
+    <link rel="prev" title="Kernel base class" href="kernels.Kernel.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,12 +42,10 @@
           <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="kernels.GaussianKernel.html" title="Gaussian kernel"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="gp.html" title="Gaussian process module"
+          <a href="kernels.Kernel.html" title="Kernel base class"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
+          <li><a href="kernels.html" accesskey="U">Kernels</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -56,36 +54,25 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-kernels">
-<span id="kernels"></span><h1>Kernels<a class="headerlink" href="#module-kernels" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="supported-kernels">
-<h2>Supported kernels<a class="headerlink" href="#supported-kernels" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="kernels.GaussianKernel.html">Gaussian kernel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kernels.PeriodicKernel.html">Periodic kernel</a></li>
-</ul>
-</div>
-</div>
-<div class="section" id="kernel-specification">
-<h2>Kernel specification<a class="headerlink" href="#kernel-specification" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="kernels.Kernel.html">Kernel base class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kernels.base.KernelMeta.html">Kernel metaclass</a></li>
-</ul>
-</div>
-<dl class="function">
-<dt id="kernels.util.lazyjit">
-<tt class="descclassname">kernels.util.</tt><tt class="descname">lazyjit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/kernels/util.html#lazyjit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.util.lazyjit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+  <div class="section" id="kernel-metaclass">
+<h1>Kernel metaclass<a class="headerlink" href="#kernel-metaclass" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="kernels.base.KernelMeta">
+<em class="property">class </em><tt class="descclassname">kernels.base.</tt><tt class="descname">KernelMeta</tt><a class="reference internal" href="_modules/kernels/base.html#KernelMeta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.base.KernelMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">type</span></tt></p>
+<dl class="method">
+<dt id="kernels.base.KernelMeta.mro">
+<tt class="descname">mro</tt><big>(</big><big>)</big> &rarr; list<a class="headerlink" href="#kernels.base.KernelMeta.mro" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a type&#8217;s method resolution order</p>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="function">
-<dt id="kernels.util.staticlazyjit">
-<tt class="descclassname">kernels.util.</tt><tt class="descname">staticlazyjit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/kernels/util.html#staticlazyjit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.util.staticlazyjit" title="Permalink to this definition">¶</a></dt>
+<dt id="kernels.util.selfparams">
+<tt class="descclassname">kernels.util.</tt><tt class="descname">selfparams</tt><big>(</big><em>f</em><big>)</big><a class="reference internal" href="_modules/kernels/util.html#selfparams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kernels.util.selfparams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</div>
 </div>
 
 
@@ -94,28 +81,12 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Kernels</a><ul>
-<li><a class="reference internal" href="#supported-kernels">Supported kernels</a><ul>
-</ul>
-</li>
-<li><a class="reference internal" href="#kernel-specification">Kernel specification</a><ul>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
   <h4>Previous topic</h4>
-  <p class="topless"><a href="gp.html"
-                        title="previous chapter">Gaussian process module</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="kernels.GaussianKernel.html"
-                        title="next chapter">Gaussian kernel</a></p>
+  <p class="topless"><a href="kernels.Kernel.html"
+                        title="previous chapter">Kernel base class</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/kernels.txt"
+    <li><a href="_sources/kernels.base.KernelMeta.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -148,12 +119,10 @@
           <a href="np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="kernels.GaussianKernel.html" title="Gaussian kernel"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="gp.html" title="Gaussian process module"
+          <a href="kernels.Kernel.html" title="Kernel base class"
              >previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
+          <li><a href="kernels.html" >Kernels</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

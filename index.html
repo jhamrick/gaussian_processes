@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to src’s documentation! &mdash; src  documentation</title>
+    <title>Gaussian Processes &mdash; gaussian_processes 0.01.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '',
+        VERSION:     '0.01.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="src  documentation" href="#" />
-    <link rel="next" title="gp Module" href="gp.html" /> 
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 0.01.2 documentation" href="#" />
+    <link rel="next" title="Gaussian process module" href="gp.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,9 +38,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gp.html" title="gp Module"
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.html" title="Gaussian process module"
              accesskey="N">next</a> |</li>
-        <li><a href="#">src  documentation</a> &raquo;</li> 
+        <li><a href="#">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -48,29 +52,46 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-src-s-documentation">
-<h1>Welcome to src&#8217;s documentation!<a class="headerlink" href="#welcome-to-src-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+  <div class="section" id="gaussian-processes">
+<h1>Gaussian Processes<a class="headerlink" href="#gaussian-processes" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">gaussian_processes</span></tt> is a Python package for using and analyzing
+<a class="reference external" href="http://en.wikipedia.org/wiki/Gaussian_process">Gaussian Processes</a>.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://jhamrick.github.io/gaussian_processes/">Documentation</a></li>
+<li><a class="reference external" href="https://github.com/jhamrick/gaussian_processes">GitHub
+Repository</a></li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/gaussian_processes">PyPI</a></li>
+</ul>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="gp.html">gp Module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kernels.html">kernels Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="kernels.html#id1"><tt class="docutils literal"><span class="pre">kernels</span></tt> Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kernels.html#module-kernels.base_kernel"><tt class="docutils literal"><span class="pre">base_kernel</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kernels.html#module-kernels.gaussian_kernel"><tt class="docutils literal"><span class="pre">gaussian_kernel</span></tt> Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kernels.html#module-kernels.periodic_kernel"><tt class="docutils literal"><span class="pre">periodic_kernel</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gp.html">Gaussian process module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels.html">Kernels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#supported-kernels">Supported kernels</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kernels.GaussianKernel.html">Gaussian kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.PeriodicKernel.html">Periodic kernel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kernels.html#kernel-specification">Kernel specification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kernels.Kernel.html">Kernel base class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kernels.base.KernelMeta.html">Kernel metaclass</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </div>
+<p>Much of this code is based off of <a class="reference internal" href="#rw06" id="id1">[RW06]</a>.</p>
+<p class="rubric">Bibliography</p>
+<table class="docutils citation" frame="void" id="rw06" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[RW06]</a></td><td>Rasmussen, C. E., &amp; Williams, C. K. I. (2006). Gaussian
+processes for machine learning. MIT Press.</td></tr>
+</tbody>
+</table>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
 </div>
 
 
@@ -81,15 +102,17 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to src&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">Gaussian Processes</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a><ul>
 </ul>
 </li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Next topic</h4>
   <p class="topless"><a href="gp.html"
-                        title="next chapter">gp Module</a></p>
+                        title="next chapter">Gaussian process module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -122,9 +145,12 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="gp.html" title="gp Module"
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.html" title="Gaussian process module"
              >next</a> |</li>
-        <li><a href="#">src  documentation</a> &raquo;</li> 
+        <li><a href="#">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>kernels &mdash; src  documentation</title>
+    <title>kernels &mdash; gaussian_processes 0.01.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '',
+        VERSION:     '0.01.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,8 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="src  documentation" href="../index.html" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 0.01.2 documentation" href="../index.html" />
     <link rel="up" title="Module code" href="index.html" /> 
   </head>
   <body>
@@ -36,7 +37,10 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">src  documentation</a> &raquo;</li>
+        <li class="right" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -47,10 +51,12 @@
           <div class="body">
             
   <h1>Source code for kernels</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">periodic_kernel</span> <span class="kn">import</span> <span class="n">PeriodicKernel</span>
-<span class="kn">from</span> <span class="nn">gaussian_kernel</span> <span class="kn">import</span> <span class="n">GaussianKernel</span>
+<span class="kn">import</span> <span class="nn">util</span>
+<span class="kn">from</span> <span class="nn">base</span> <span class="kn">import</span> <span class="n">Kernel</span>
+<span class="kn">from</span> <span class="nn">periodic</span> <span class="kn">import</span> <span class="n">PeriodicKernel</span>
+<span class="kn">from</span> <span class="nn">gaussian</span> <span class="kn">import</span> <span class="n">GaussianKernel</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;PeriodicKernel&#39;</span><span class="p">,</span> <span class="s">&#39;GaussianKernel&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Kernel&#39;</span><span class="p">,</span> <span class="s">&#39;PeriodicKernel&#39;</span><span class="p">,</span> <span class="s">&#39;GaussianKernel&#39;</span><span class="p">,</span> <span class="s">&#39;util&#39;</span><span class="p">]</span>
 </pre></div>
 
           </div>
@@ -84,7 +90,10 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">src  documentation</a> &raquo;</li>
+        <li class="right" >
+          <a href="../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li>
           <li><a href="index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
