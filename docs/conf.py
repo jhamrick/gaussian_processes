@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# src documentation build configuration file, created by
+# gaussian_processes documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun 29 16:21:04 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -28,7 +28,8 @@ sys.path.insert(0, os.path.abspath('../src'))
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx.ext.mathjax',
-              'numpydoc']
+              'numpydoc',
+              'sphinx.ext.autosummary']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -43,7 +44,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'src'
+project = u'gaussian_processes'
 copyright = u'2013, Jessica B. Hamrick'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -170,7 +171,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'srcdoc'
+htmlhelp_basename = 'gaussian_processes_doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -189,7 +190,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'src.tex', u'src Documentation',
+  ('index', 'gaussian_processes.tex', u'gaussian_processes Documentation',
    u'Jessica B. Hamrick', 'manual'),
 ]
 
@@ -219,7 +220,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'src', u'src Documentation',
+    ('index', 'gaussian_processes', u'gaussian_processes Documentation',
      [u'Jessica B. Hamrick'], 1)
 ]
 
@@ -233,8 +234,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'src', u'src Documentation',
-   u'Jessica B. Hamrick', 'src', 'One line description of project.',
+  ('index', 'gaussian_processes', u'gaussian_processes Documentation',
+   u'Jessica B. Hamrick', 'gaussian_processes', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -254,7 +255,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'src'
+epub_title = u'gaussian_processes'
 epub_author = u'Jessica B. Hamrick'
 epub_publisher = u'Jessica B. Hamrick'
 epub_copyright = u'2013, Jessica B. Hamrick'
@@ -307,3 +308,21 @@ epub_copyright = u'2013, Jessica B. Hamrick'
 
 # If false, no index is generated.
 #epub_use_index = True
+
+# -- Options for autodoc ---------------------------------------------
+
+autoclass_content = 'class'
+autodoc_member_order = 'groupwise'
+autodoc_default_flags = ['members',
+                         'undoc-members',
+                         'inherited-members',
+                         'show-inheritance']
+
+# -- Options for autosummary------------------------------------------
+
+autosummary_generate = False
+
+
+# -- Options for numpydoc --------------------------------------------
+
+numpydoc_show_class_members = False
