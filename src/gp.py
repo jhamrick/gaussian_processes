@@ -41,12 +41,7 @@ class GP(object):
     y : numpy.ndarray
         :math:`n\times 1` array of input observations
     s : number (default=0)
-        Observation noise parameter
-
-    References
-    ----------
-    * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-      processes for machine learning.` MIT Press.
+        Standard deviation of observation noise
 
     """
 
@@ -64,11 +59,6 @@ class GP(object):
         self.x = x
         self.y = y
         self.s = s
-
-    def copy(self):
-        new_gp = GP(self.K.copy(), self.x, self.y, s=self.s)
-        new_gp._memoized = copy.deepcopy(self._memoized)
-        return new_gp
 
     @property
     def x(self):
@@ -151,22 +141,39 @@ class GP(object):
         if params[-1] != val[-1]:
             self.s = val[-1]
 
+    def copy(self):
+        """
+        Create a copy of the gaussian process object.
+
+        Returns
+        -------
+        gp : :class:`gp.GP`
+            New gaussian process object
+
+        """
+        new_gp = GP(self.K.copy(), self.x, self.y, s=self.s)
+        new_gp._memoized = copy.deepcopy(self._memoized)
+        return new_gp
+
     @memoprop
     def Kxx(self):
         r"""
-        Kernel covariance matrix :math:`\mathbf{K}_{xx}`, where the
-        entry at index :math:`(i, j)` is defined as:
+        Kernel covariance matrix :math:`\mathbf{K}_{xx}`.
+
+        Returns
+        -------
+        Kxx : numpy.ndarray
+            :math:`n\times n` covariance matrix
+
+        Notes
+        -----
+        The entry at index :math:`(i, j)` is defined as:
 
         .. math:: K_{x_ix_j} = K(x_i, x_j) + s^2\delta(x_i-x_j),
 
         where :math:`K(\cdot{})` is the kernel function, :math:`s` is the
         standard deviation of the observation noise, and :math:`\delta`
         is the Dirac delta function.
-
-        Returns
-        -------
-        Kxx : numpy.ndarray
-            :math:`n\times n` covariance matrix
 
         """
         x, s = self._x, self._s
@@ -180,14 +187,17 @@ class GP(object):
     @memoprop
     def Lxx(self):
         r"""
-        Cholesky decomposition of the kernel covariance matrix. The
-        value is :math:`\mathbf{L}_{xx}`, such that
-        :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.
+        Cholesky decomposition of the kernel covariance matrix.
 
         Returns
         -------
         Lxx : numpy.ndarray
             :math:`n\times n` lower triangular matrix
+
+        Notes
+        -----
+        The value is :math:`\mathbf{L}_{xx}`, such that
+        :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.
 
         """
         return np.linalg.cholesky(self.Kxx)
@@ -195,15 +205,18 @@ class GP(object):
     @memoprop
     def inv_Lxx(self):
         r"""
-        Inverse cholesky decomposition of the kernel covariance
-        matrix. The value is :math:`\mathbf{L}_{xx}^{-1}`, such that:
-
-        .. math:: \mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top
+        Inverse cholesky decomposition of the kernel covariance matrix.
 
         Returns
         -------
         inv_Lxx : numpy.ndarray
             :math:`n\times n` matrix
+
+        Notes
+        -----
+        The value is :math:`\mathbf{L}_{xx}^{-1}`, such that:
+
+        .. math:: \mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top
 
         """
         return np.linalg.inv(self.Lxx)
@@ -225,14 +238,17 @@ class GP(object):
     @memoprop
     def inv_Kxx_y(self):
         r"""
-        Dot product of the inverse kernel covariance matrix and vector
-        of observations, defined as
-        :math:`\mathbf{K}_{xx}^{-1}\mathbf{y}`.
+        Dot product of the inverse kernel covariance matrix and of
+        observation vector.
 
         Returns
         -------
         inv_Kxx_y : numpy.ndarray
             :math:`n\times 1` array
+
+        Notes
+        -----
+        This is defined as :math:`\mathbf{K}_{xx}^{-1}\mathbf{y}`.
 
         """
         return np.dot(self.inv_Kxx, self._y)
@@ -240,26 +256,24 @@ class GP(object):
     @memoprop
     def log_lh(self):
         r"""
-        Marginal log likelihood of observations :math:`\mathbf{y}` given
-        locations :math:`\mathbf{x}` and kernel parameters
-        :math:`\theta`. It is defined by Eq. 5.8 of Rasmussen & Williams
-        (2006):
-
-        .. math::
-
-            \log{p(\mathbf{y} | \mathbf{x}, \mathbf{\theta})} = -\frac{1}{2}\mathbf{y}^\top \mathbf{K}_{xx}^{-1}\mathbf{y} - \frac{1}{2}\log{\left|\mathbf{K}_{xx}\right|}-\frac{d}{2}\log{2\pi},
-
-        where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
+        Marginal log likelihood.
 
         Returns
         -------
         log_lh : float
             Marginal log likelihood
 
-        References
-        ----------
-        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-          processes for machine learning.` MIT Press.
+        Notes
+        -----
+        This is the log likelihood of observations :math:`\mathbf{y}`
+        given locations :math:`\mathbf{x}` and kernel parameters
+        :math:`\theta`. It is defined by Eq. 5.8 of [RW06]_:
+
+        .. math::
+
+            \log{p(\mathbf{y} | \mathbf{x}, \mathbf{\theta})} = -\frac{1}{2}\mathbf{y}^\top \mathbf{K}_{xx}^{-1}\mathbf{y} - \frac{1}{2}\log{\left|\mathbf{K}_{xx}\right|}-\frac{d}{2}\log{2\pi},
+
+        where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
         """
         y, K = self._y, self.Kxx
@@ -280,7 +294,16 @@ class GP(object):
     @memoprop
     def lh(self):
         r"""
-        Marginal likelihood of observations :math:`\mathbf{y}` given
+        Marginal likelihood.
+
+        Returns
+        -------
+        lh : float
+            Marginal likelihood
+
+        Notes
+        -----
+        This is the likelihood of observations :math:`\mathbf{y}` given
         locations :math:`\mathbf{x}` and kernel parameters
         :math:`\theta`. It is defined as:
 
@@ -290,24 +313,13 @@ class GP(object):
 
         where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
-        Returns
-        -------
-        lh : float
-            Marginal likelihood
-
         """
         return np.exp(self.log_lh)
 
     @memoprop
     def dloglh_dtheta(self):
         r"""
-        Vector of first partial derivatives of the marginal log
-        likelihood with respect to its parameters :math:`\theta`. It is
-        defined by Equation 5.9 of Rasmussen & Williams (2006):
-
-        .. math::
-
-            \frac{\partial}{\partial\theta_i}\log{p(\mathbf{y}|\mathbf{x},\theta)}=\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}-\frac{1}{2}\mathbf{tr}\left(\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\right)
+        Derivative of the marginal log likelihood.
 
         Returns
         -------
@@ -316,10 +328,15 @@ class GP(object):
             :math:`n_\theta` is the number of parameters (equivalent to
             ``len(self.params)``).
 
-        References
-        ----------
-        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-          processes for machine learning.` MIT Press.
+        Notes
+        -----
+        This is a vector of first partial derivatives of the log
+        likelihood with respect to its parameters :math:`\theta`. It is
+        defined by Equation 5.9 of [RW06]_:
+
+        .. math::
+
+            \frac{\partial}{\partial\theta_i}\log{p(\mathbf{y}|\mathbf{x},\theta)}=\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}-\frac{1}{2}\mathbf{tr}\left(\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\right)
 
         """
 
@@ -348,8 +365,7 @@ class GP(object):
     @memoprop
     def dlh_dtheta(self):
         r"""
-        Vector of first partial derivatives of the marginal likelihood
-        with respect to its parameters :math:`\theta`.
+        Derivative of the marginal likelihood.
 
         Returns
         -------
@@ -357,6 +373,11 @@ class GP(object):
             :math:`n_\theta`-length vector of derivatives, where
             :math:`n_\theta` is the number of parameters (equivalent to
             ``len(self.params)``).
+
+        Notes
+        -----
+        This is a vector of first partial derivatives of the likelihood
+        with respect to its parameters :math:`\theta`.
 
         """
 
@@ -381,8 +402,7 @@ class GP(object):
     @memoprop
     def d2lh_dtheta2(self):
         r"""
-        Matrix of second partial derivatives of the marginal likelihood
-        with respect to its parameters :math:`\theta`.
+        Second derivative of the marginal likelihood.
 
         Returns
         -------
@@ -390,6 +410,11 @@ class GP(object):
             :math:`n_\theta`-length vector of derivatives, where
             :math:`n_\theta` is the number of parameters (equivalent to
             ``len(self.params)``).
+
+        Notes
+        -----
+        This is a matrix of second partial derivatives of the likelihood
+        with respect to its parameters :math:`\theta`.
 
         """
 
@@ -435,9 +460,7 @@ class GP(object):
 
     def Kxoxo(self, xo):
         r"""
-        Kernel covariance matrix of new sample locations
-        :math:`\mathbf{x^*}`, defined as :math:`K(\mathbf{x^*},
-        \mathbf{x^*})`.
+        Kernel covariance matrix of new sample locations.
 
         Parameters
         ----------
@@ -449,15 +472,18 @@ class GP(object):
         Kxoxo : numpy.ndarray
             :math:`m\times m` covariance matrix
 
+        Notes
+        -----
+        This is defined as :math:`K(\mathbf{x^*}, \mathbf{x^*})`, where
+        :math:`\mathbf{x^*}` are the new locations.
+
         """
         return self.K(xo, xo)
 
     def Kxxo(self, xo):
         r"""
-        Kernel covariance matrix between given locations
-        :math:`\mathbf{x}` and new sample locations
-        :math:`\mathbf{x^*}`, defined as
-        :math:`K(\mathbf{x},\mathbf{x^*})`.
+        Kernel covariance matrix between given locations and new sample
+        locations.
 
         Parameters
         ----------
@@ -469,14 +495,19 @@ class GP(object):
         Kxxo : numpy.ndarray
             :math:`n\times m` covariance matrix
 
+        Notes
+        -----
+        This is defined as :math:`K(\mathbf{x},\mathbf{x^*})`, where
+        :math:`\mathbf{x}` are the given locations and
+        :math:`\mathbf{x^*}` are the new sample locations.
+
         """
         return self.K(self._x, xo)
 
     def Kxox(self, xo):
         r"""
-        Kernel covariance matrix between new sample locations
-        :math:`\mathbf{x^*}` and given locations :math:`\mathbf{x}`,
-        defined as :math:`K(\mathbf{x^*},\mathbf{x})`.
+        Kernel covariance matrix between new sample locations and given
+        locations.
 
         Parameters
         ----------
@@ -488,17 +519,18 @@ class GP(object):
         Kxox : numpy.ndarray
             :math:`m\times n` covariance matrix
 
+        Notes
+        -----
+        This is defined as :math:`K(\mathbf{x^*},\mathbf{x})`, where
+        :math:`\mathbf{x^*}` are the new sample locations and
+        :math:`\mathbf{x}` are the given locations
+
         """
         return self.K(xo, self._x)
 
     def mean(self, xo):
         r"""
-        Predictive mean of the gaussian process, defined by Equation
-        2.23 of Rasmussen & Williams (2006):
-
-        .. math::
-
-            \mathbf{m}(\mathbf{x^*})=K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\mathbf{y}
+        Predictive mean of the gaussian process.
 
         Parameters
         ----------
@@ -510,22 +542,20 @@ class GP(object):
         mean : numpy.ndarray
             :math:`m\times d` array of predictive means
 
-        References
-        ----------
-        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-          processes for machine learning.` MIT Press.
+        Notes
+        -----
+        This is defined by Equation 2.23 of [RW06]_:
+
+        .. math::
+
+            \mathbf{m}(\mathbf{x^*})=K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\mathbf{y}
 
         """
         return np.dot(self.Kxox(xo), self.inv_Kxx_y)
 
     def cov(self, xo):
         r"""
-        Predictive covariance of the gaussian process, defined by
-        Eq. 2.24 of Rasmussen & Williams (2006):
-
-        .. math::
-
-            \mathbf{C}=K(\mathbf{x^*}, \mathbf{x^*}) - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}K(\mathbf{x}, \mathbf{x^*})
+        Predictive covariance of the gaussian process.
 
         Parameters
         ----------
@@ -537,10 +567,13 @@ class GP(object):
         cov : numpy.ndarray
             :math:`m\times m` array of predictive covariances
 
-        References
-        ----------
-        * Rasmussen, C. E., & Williams, C. K. I. (2006). `Gaussian
-          processes for machine learning.` MIT Press.
+        Notes
+        -----
+        This is defined by Eq. 2.24 of [RW06]_:
+
+        .. math::
+
+            \mathbf{C}=K(\mathbf{x^*}, \mathbf{x^*}) - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}K(\mathbf{x}, \mathbf{x^*})
 
         """
         Kxoxo = self.Kxoxo(xo)

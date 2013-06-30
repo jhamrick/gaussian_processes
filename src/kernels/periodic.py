@@ -13,11 +13,6 @@ class PeriodicKernel(Kernel):
 
     $$k(x_1, x_2) = h^2\exp(-\frac{2\sin^2(\frac{x_1-x_2}{2p})}{w^2})$$
 
-    References
-    ----------
-    Rasmussen, C. E., & Williams, C. K. I. (2006). Gaussian processes
-        for machine learning. MIT Press.
-
     """
 
     __metaclass__ = Kernel.__metaclass__
