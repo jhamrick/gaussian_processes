@@ -1,14 +1,16 @@
 import numba
+from functools import wraps
 
 
 def selfparams(f):
-    def wrapped_func(self, x1, x2):
+    @wraps(f)
+    def wrapper(self, x1, x2):
         return f(x1.astype('f8', copy=False),
                  x2.astype('f8', copy=False),
                  *self.params)
-    wrapped_func.__name__ = f.__name__
-    wrapped_func.__doc__ = f.__doc__
-    return wrapped_func
+    if wrapper.__name__.startswith("_"):
+        wrapper.__name__ = wrapper.__name__[1:]
+    return wrapper
 
 
 def lazyjit(*args, **kwargs):
@@ -17,13 +19,23 @@ def lazyjit(*args, **kwargs):
     def compile(f):
         f.compiled = None
 
-        def thunk(*fargs, **fkwargs):
+        @wraps(f)
+        def wrapper(*fargs, **fkwargs):
             if not f.compiled:
                 f.compiled = compiler(f)
             return f.compiled(*fargs, **fkwargs)
 
-        thunk.__name__ = f.__name__
-        thunk.__doc__ = f.__doc__
-        return thunk
+        return wrapper
 
     return compile
+
+
+def staticlazyjit(*args, **kwargs):
+    lazyjitdeco = lazyjit(*args, **kwargs)
+
+    def wrapper(f):
+        f_jit = lazyjitdeco(f)
+        f_static = staticmethod(f_jit)
+        return f_static
+
+    return wrapper
