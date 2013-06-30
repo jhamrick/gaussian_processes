@@ -2,10 +2,10 @@ import numba
 
 
 def selfparams(f):
-    def wrapped_func(obj, x1, x2):
+    def wrapped_func(self, x1, x2):
         return f(x1.astype('f8', copy=False),
                  x2.astype('f8', copy=False),
-                 *obj.params)
+                 *self.params)
     wrapped_func.__name__ = f.__name__
     wrapped_func.__doc__ = f.__doc__
     return wrapped_func
