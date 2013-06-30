@@ -1,12 +1,14 @@
-import numpy as np
-from numpy import exp, sqrt, pi
+__all__ = ['GaussianKernel']
 
+import numpy as np
 import sympy as sym
 
-from base_kernel import BaseKernel, lazyjit
+from numpy import exp, sqrt, pi
+from . import Kernel
+from util import lazyjit
 
 
-class GaussianKernel(object):
+class GaussianKernel(Kernel):
     """Represents a gaussian kernel function, of the form:
 
     $$k(x_1, x_2) = h^2\frac{1}{\sqrt{2\pi w^2}}\exp(-\frac{(x_1-x_2)^2}{2w^2})$$
@@ -18,7 +20,7 @@ class GaussianKernel(object):
 
     """
 
-    __metaclass__ = BaseKernel
+    __metaclass__ = Kernel.__metaclass__
     __slots__ = ['h', 'w']
 
     _sym_h = sym.Symbol('h')
@@ -52,9 +54,6 @@ class GaussianKernel(object):
 
         f = h2 * (1. / sym.sqrt(2*sym.pi*w2)) * sym.exp(-d2 / (2.0 * w2))
         return f
-
-    def copy(self):
-        return GaussianKernel(*self.params)
 
     @property
     def params(self):

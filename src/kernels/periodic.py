@@ -1,12 +1,14 @@
-import numpy as np
-from numpy import exp, sin, cos
+__all__ = ['PeriodicKernel']
 
+import numpy as np
 import sympy as sym
 
-from base_kernel import BaseKernel, lazyjit
+from numpy import exp, sin, cos
+from . import Kernel
+from util import lazyjit
 
 
-class PeriodicKernel(object):
+class PeriodicKernel(Kernel):
     """Represents a periodic kernel function, of the form:
 
     $$k(x_1, x_2) = h^2\exp(-\frac{2\sin^2(\frac{x_1-x_2}{2p})}{w^2})$$
@@ -18,7 +20,7 @@ class PeriodicKernel(object):
 
     """
 
-    __metaclass__ = BaseKernel
+    __metaclass__ = Kernel.__metaclass__
     __slots__ = ['h', 'w', 'p']
 
     _sym_h = sym.Symbol('h')
@@ -56,9 +58,6 @@ class PeriodicKernel(object):
 
         f = h2 * sym.exp(-2.*(sym.sin(d / (2.*p)) ** 2) / w2)
         return f
-
-    def copy(self):
-        return PeriodicKernel(*self.params)
 
     @property
     def params(self):

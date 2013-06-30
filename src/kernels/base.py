@@ -1,31 +1,9 @@
-import numba
+__all__ = ['Kernel']
+
+from util import selfparams
 
 
-def selfparams(f):
-    def wrapped_func(obj, x1, x2):
-        return f(x1.astype('f8', copy=False),
-                 x2.astype('f8', copy=False),
-                 *obj.params)
-    wrapped_func.__name__ = f.__name__
-    wrapped_func.__doc__ = f.__doc__
-    return wrapped_func
-
-
-def lazyjit(*args, **kwargs):
-    compiler = numba.jit(*args, **kwargs)
-    def compile(f):
-        f.compiled = None
-        def thunk(*fargs, **fkwargs):
-            if not f.compiled:
-                f.compiled = compiler(f)
-            return f.compiled(*fargs, **fkwargs)
-        thunk.__name__ = f.__name__
-        thunk.__doc__ = f.__doc__
-        return thunk
-    return compile
-
-
-class BaseKernel(type):
+class KernelMeta(type):
 
     def __new__(cls, name, parents, attrs):
 
@@ -63,6 +41,35 @@ class BaseKernel(type):
             new_attrs['__call__'] = new_attrs['K']
 
         # create the class
-        obj = super(BaseKernel, cls).__new__(
+        obj = super(KernelMeta, cls).__new__(
             cls, name, parents, new_attrs)
         return obj
+
+
+class Kernel(object):
+
+    __metaclass__ = KernelMeta
+
+    @property
+    def copy(self):
+        return type(self)(*self.params)
+
+    @property
+    def sym_K(self):
+        raise NotImplementedError
+
+    @property
+    def params(self):
+        raise NotImplementedError
+
+    @staticmethod
+    def _K(x1, x2, *params):
+        raise NotImplementedError
+
+    @staticmethod
+    def _jacobian(x1, x2, *params):
+        raise NotImplementedError
+
+    @staticmethod
+    def _hessian(x1, x2, *params):
+        raise NotImplementedError
