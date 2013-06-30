@@ -74,7 +74,7 @@ exclude_patterns = ['_build']
 #default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-#add_function_parentheses = True
+add_function_parentheses = False
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
@@ -171,7 +171,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'gaussian_processes_doc'
+htmlhelp_basename = 'gaussian_processes'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -312,7 +312,7 @@ epub_copyright = u'2013, Jessica B. Hamrick'
 # -- Options for autodoc ---------------------------------------------
 
 autoclass_content = 'class'
-autodoc_member_order = 'groupwise'
+autodoc_member_order = 'bysource'
 autodoc_default_flags = ['members',
                          'undoc-members',
                          'inherited-members',
