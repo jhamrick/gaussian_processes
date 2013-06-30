@@ -50,7 +50,6 @@ class Kernel(object):
 
     __metaclass__ = KernelMeta
 
-    @property
     def copy(self):
         """
         Create a copy of the kernel.
