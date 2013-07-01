@@ -580,3 +580,61 @@ class GP(object):
         Kxox = self.Kxox(xo)
         Kxxo = self.Kxxo(xo)
         return Kxoxo - np.dot(Kxox, np.dot(self.inv_Kxx, Kxxo))
+
+    def dm_dtheta(self, xo):
+        r"""
+
+        Derivative of the mean of the gaussian process with respect to
+        its parameters, `theta`, and evaluated at `xo`.
+
+        Parameters
+        ----------
+        xo : numpy.ndarray
+            :math:`m\times d` array of new sample locations
+        theta : str
+            Kernel parameter, e.g. 'w' or 'h'
+
+        Returns
+        -------
+        dm_dtheta : numpy.ndarray
+            :math:`n_p\times m\times d` array, where :math:`n_p` is the
+            number of parameters (see `params`).
+
+        Notes
+        -----
+        The analytic form is:
+
+        .. math::
+
+            \frac{\partial}{\partial \theta_i}m(\mathbf{x^*})=\frac{\partial K(\mathbf{x^*}, \mathbf{x})}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y} - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\frac{\partial \mathbf{K}_{xx}}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}
+
+        """
+
+        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
+        Kxox = self.Kxox(xo)
+
+        # dimensions
+        n, d = x.shape
+        m, d = xo.shape
+
+        # compute kernel derivatives for s
+        dKxox_ds = np.zeros((1, m, n))
+        dKxx_ds = (np.eye(n) * 2 * self.s)[None]
+
+        # all kernel partial derivatives
+        dKxox_dtheta = np.concatenate([
+            self.K.jacobian(xo, x), dKxox_ds], axis=0)
+        dKxx_dtheta = np.concatenate([
+            self.K.jacobian(x, x), dKxx_ds], axis=0)
+
+        # number of parameters
+        n_p = dKxx_dtheta.shape[0]
+
+        dm = np.empty((n_p, m, d))
+        for i in xrange(n_p):
+            inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
+            term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))
+            term2 = np.dot(Kxox, np.dot(inv_dKxx_dtheta, y))
+            dm[i] = term1 - term2
+
+        return dm
