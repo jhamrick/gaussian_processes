@@ -618,8 +618,8 @@ class GP(object):
         m, d = xo.shape
 
         # compute kernel derivatives for s
-        dKxox_ds = np.zeros((m, n))
-        dKxx_ds = np.eye(n) * 2 * self.s
+        dKxox_ds = np.zeros((1, m, n))
+        dKxx_ds = (np.eye(n) * 2 * self.s)[None]
 
         # all kernel partial derivatives
         dKxox_dtheta = np.concatenate([
