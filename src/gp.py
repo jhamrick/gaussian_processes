@@ -583,16 +583,13 @@ class GP(object):
 
     def dm_dtheta(self, xo):
         r"""
-
         Derivative of the mean of the gaussian process with respect to
-        its parameters, `theta`, and evaluated at `xo`.
+        its parameters, and evaluated at `xo`.
 
         Parameters
         ----------
         xo : numpy.ndarray
             :math:`m\times d` array of new sample locations
-        theta : str
-            Kernel parameter, e.g. 'w' or 'h'
 
         Returns
         -------
