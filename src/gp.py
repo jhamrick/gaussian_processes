@@ -627,7 +627,7 @@ class GP(object):
         # number of parameters
         n_p = dKxx_dtheta.shape[0]
 
-        dm = np.empty((n_p, m, d))
+        dm = np.empty((n_p, m, 1))
         for i in xrange(n_p):
             inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
             term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))
