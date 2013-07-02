@@ -16,6 +16,11 @@ def make_xy():
     return x, y
 
 
+def make_xo():
+    xo = np.linspace(-2*np.pi, 2*np.pi, 32)[:, None]
+    return xo
+
+
 ######################################################################
 
 class TestGP(object):
@@ -123,6 +128,34 @@ class TestGP(object):
             print approx_hess
             raise AssertionError("bad d2lh_dtheta2")
 
+    def check_dm(self, xo, gp, params):
+        jac = gp.dm_dtheta(xo)
+
+        approx_jac = np.empty(jac.shape)
+        for i in xrange(len(params)):
+            p0 = list(params)
+            p0[i] -= self.dtheta
+            gp0 = gp.copy()
+            gp0.params = p0
+
+            p1 = list(params)
+            p1[i] += self.dtheta
+            gp1 = gp.copy()
+            gp1.params = p1
+
+            approx_jac[i] = approx_deriv(
+                gp0.mean(xo), gp1.mean(xo), self.dtheta)
+
+        diff = np.abs(jac - approx_jac)
+        bad = diff > self.thresh
+        if bad.any():
+            print "threshold:", self.thresh
+            print "worst err:", diff.max()
+            print "frac bad: ", (np.sum(bad) / float(bad.size))
+            print jac
+            print approx_jac
+            raise AssertionError("bad dm_dtheta")
+
     ##################################################################
 
     def test_mean(self):
@@ -202,6 +235,24 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_d2lh(gp, params + (s,))
+            except:
+                traceback.print_exc()
+                failures += 1
+        ffail = failures / self.N_big
+        if ffail > 0.1:
+            print "%f%% failed" % ffail
+            raise AssertionError
+
+    def test_dm(self):
+        x, y = make_xy()
+        xo = make_xo()
+        failures = 0.
+        for i in xrange(self.N_big):
+            params = rand_params('h', 'w')
+            s = rand_params('s')
+            gp = GP(kernel(*params), x, y, s=s)
+            try:
+                self.check_dm(xo, gp, params + (s,))
             except:
                 traceback.print_exc()
                 failures += 1
