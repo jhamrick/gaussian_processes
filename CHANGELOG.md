@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.01.3
+## Version 0.1.3
 
 * Fix pip installion bug
 * Add a few new methods to `GP`:
@@ -8,6 +8,7 @@
       gaussian process with respect to its parameters
 	* `plot` -- use pyplot to plot the predictive mean and variance of
       the gaussian process
+* Switch to semantic versioning
 
 ## Version 0.01.2
 
