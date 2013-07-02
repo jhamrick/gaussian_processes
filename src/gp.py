@@ -2,6 +2,7 @@ __all__ = ["GP"]
 
 import numpy as np
 import copy
+import matplotlib.pyplot as plt
 
 
 def memoprop(f):
@@ -580,3 +581,101 @@ class GP(object):
         Kxox = self.Kxox(xo)
         Kxxo = self.Kxxo(xo)
         return Kxoxo - np.dot(Kxox, np.dot(self.inv_Kxx, Kxxo))
+
+    def dm_dtheta(self, xo):
+        r"""
+        Derivative of the mean of the gaussian process with respect to
+        its parameters, and evaluated at `xo`.
+
+        Parameters
+        ----------
+        xo : numpy.ndarray
+            :math:`m\times d` array of new sample locations
+
+        Returns
+        -------
+        dm_dtheta : numpy.ndarray
+            :math:`n_p\times m\times d` array, where :math:`n_p` is the
+            number of parameters (see `params`).
+
+        Notes
+        -----
+        The analytic form is:
+
+        .. math::
+
+            \frac{\partial}{\partial \theta_i}m(\mathbf{x^*})=\frac{\partial K(\mathbf{x^*}, \mathbf{x})}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y} - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\frac{\partial \mathbf{K}_{xx}}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}
+
+        """
+
+        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
+        Kxox = self.Kxox(xo)
+
+        # dimensions
+        n, d = x.shape
+        m, d = xo.shape
+
+        # compute kernel derivatives for s
+        dKxox_ds = np.zeros((1, m, n))
+        dKxx_ds = (np.eye(n) * 2 * self.s)[None]
+
+        # all kernel partial derivatives
+        dKxox_dtheta = np.concatenate([
+            self.K.jacobian(xo, x), dKxox_ds], axis=0)
+        dKxx_dtheta = np.concatenate([
+            self.K.jacobian(x, x), dKxx_ds], axis=0)
+
+        # number of parameters
+        n_p = dKxx_dtheta.shape[0]
+
+        dm = np.empty((n_p, m, 1))
+        for i in xrange(n_p):
+            inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
+            term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))
+            term2 = np.dot(Kxox, np.dot(inv_dKxx_dtheta, y))
+            dm[i] = term1 - term2
+
+        return dm
+
+    def plot(self, ax=None, xlim=None, color='k', markercolor='r'):
+        """
+        Plot the predictive mean and variance of the gaussian process.
+
+        Parameters
+        ----------
+        ax : `matplotlib.pyplot.axes.Axes` (optional)
+            The axes on which to draw the graph. Defaults to
+            ``plt.gca()`` if not given.
+        xlim : (lower x limit, upper x limit) (optional)
+            The limits of the x-axis. Defaults to the minimum and
+            maximum of `x` if not given.
+        color : str (optional)
+            The line color to use. The default is 'k' (black).
+        markercolor : str (optional)
+            The marker color to use. The default is 'r' (red).
+
+        """
+
+        x, y = self._x, self._y
+        n, d = x.shape
+        if d != 1:
+            raise ValueError("data has too many dimensions")
+        x = x[:, 0]
+        y = y[:, 0]
+
+        if ax is None:
+            ax = plt.gca()
+        if xlim is None:
+            xlim = (x.min(), x.max())
+
+        X = np.linspace(xlim[0], xlim[1], 1000)
+        mean = self.mean(X)[:, 0]
+        cov = self.cov(X)
+        std = np.sqrt(np.diag(cov))
+        upper = mean + std
+        lower = mean - std
+
+        ax.fill_between(X, lower, upper, color=color, alpha=0.3)
+        ax.plot(X, mean, lw=2, color=color)
+        ax.plot(x, y, 'o', ms=7, color=markercolor)
+        ax.set_xlim(*xlim)
