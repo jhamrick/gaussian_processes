@@ -2,6 +2,7 @@ __all__ = ["GP"]
 
 import numpy as np
 import copy
+import matplotlib.pyplot as plt
 
 
 def memoprop(f):
@@ -635,3 +636,46 @@ class GP(object):
             dm[i] = term1 - term2
 
         return dm
+
+    def plot(self, ax=None, xlim=None, color='k', markercolor='r'):
+        """
+        Plot the predictive mean and variance of the gaussian process.
+
+        Parameters
+        ----------
+        ax : `matplotlib.pyplot.axes.Axes` (optional)
+            The axes on which to draw the graph. Defaults to
+            ``plt.gca()`` if not given.
+        xlim : (lower x limit, upper x limit) (optional)
+            The limits of the x-axis. Defaults to the minimum and
+            maximum of `x` if not given.
+        color : str (optional)
+            The line color to use. The default is 'k' (black).
+        markercolor : str (optional)
+            The marker color to use. The default is 'r' (red).
+
+        """
+
+        x, y = self._x, self._y
+        n, d = x.shape
+        if d != 1:
+            raise ValueError("data has too many dimensions")
+        x = x[:, 0]
+        y = y[:, 0]
+
+        if ax is None:
+            ax = plt.gca()
+        if xlim is None:
+            xlim = (x.min(), x.max())
+
+        X = np.linspace(xlim[0], xlim[1], 1000)
+        mean = self.mean(X)[:, 0]
+        cov = self.cov(X)
+        std = np.sqrt(np.diag(cov))
+        upper = mean + std
+        lower = mean - std
+
+        ax.fill_between(X, lower, upper, color=color, alpha=0.3)
+        ax.plot(X, mean, lw=2, color=color)
+        ax.plot(x, y, 'o', ms=7, color=markercolor)
+        ax.set_xlim(*xlim)
