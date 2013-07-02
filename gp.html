@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Gaussian process module &mdash; gaussian_processes 0.01.2 documentation</title>
+    <title>Gaussian process module &mdash; gaussian_processes 0.1.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.01.2',
+        VERSION:     '0.1.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="gaussian_processes 0.01.2 documentation" href="index.html" />
+    <link rel="top" title="gaussian_processes 0.1.3 documentation" href="index.html" />
     <link rel="next" title="Kernels" href="kernels.html" />
     <link rel="prev" title="Gaussian Processes" href="index.html" /> 
   </head>
@@ -47,7 +47,7 @@
         <li class="right" >
           <a href="index.html" title="Gaussian Processes"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">gaussian_processes 0.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -343,6 +343,36 @@ defined by Equation 5.9 of <a class="reference internal" href="index.html#rw06" 
 \[\frac{\partial}{\partial\theta_i}\log{p(\mathbf{y}|\mathbf{x},\theta)}=\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}-\frac{1}{2}\mathbf{tr}\left(\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\right)\]</div>
 </dd></dl>
 
+<dl class="method">
+<dt id="gp.GP.dm_dtheta">
+<tt class="descname">dm_dtheta</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp.html#GP.dm_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.dm_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the mean of the gaussian process with respect to
+its parameters, and evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">xo</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\times d\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>dm_dtheta</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n_p\times m\times d\)</span> array, where <span class="math">\(n_p\)</span> is the
+number of parameters (see <a class="reference internal" href="#gp.GP.params" title="gp.GP.params"><tt class="xref py py-obj docutils literal"><span class="pre">params</span></tt></a>).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The analytic form is:</p>
+<div class="math">
+\[\frac{\partial}{\partial \theta_i}m(\mathbf{x^*})=\frac{\partial K(\mathbf{x^*}, \mathbf{x})}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y} - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\frac{\partial \mathbf{K}_{xx}}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}\]</div>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="gp.GP.inv_Kxx">
 <tt class="descname">inv_Kxx</tt><a class="reference internal" href="_modules/gp.html#GP.inv_Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.inv_Kxx" title="Permalink to this definition">¶</a></dt>
@@ -501,6 +531,38 @@ observation noise parameter, <span class="math">\(s\)</span>, in that order.</p>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="gp.GP.plot">
+<tt class="descname">plot</tt><big>(</big><em>ax=None</em>, <em>xlim=None</em>, <em>color='k'</em>, <em>markercolor='r'</em><big>)</big><a class="headerlink" href="#gp.GP.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the predictive mean and variance of the gaussian process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>ax</strong> : <tt class="xref py py-obj docutils literal"><span class="pre">matplotlib.pyplot.axes.Axes</span></tt> (optional)</p>
+<blockquote>
+<div><p>The axes on which to draw the graph. Defaults to
+<tt class="docutils literal"><span class="pre">plt.gca()</span></tt> if not given.</p>
+</div></blockquote>
+<p><strong>xlim</strong> : (lower x limit, upper x limit) (optional)</p>
+<blockquote>
+<div><p>The limits of the x-axis. Defaults to the minimum and
+maximum of <a class="reference internal" href="#gp.GP.x" title="gp.GP.x"><tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt></a> if not given.</p>
+</div></blockquote>
+<p><strong>color</strong> : str (optional)</p>
+<blockquote>
+<div><p>The line color to use. The default is &#8216;k&#8217; (black).</p>
+</div></blockquote>
+<p><strong>markercolor</strong> : str (optional)</p>
+<blockquote class="last">
+<div><p>The marker color to use. The default is &#8216;r&#8217; (red).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="gp.GP.s">
 <tt class="descname">s</tt><a class="reference internal" href="_modules/gp.html#GP.s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.GP.s" title="Permalink to this definition">¶</a></dt>
@@ -610,7 +672,7 @@ observations.</p>
         <li class="right" >
           <a href="index.html" title="Gaussian Processes"
              >previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.01.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">gaussian_processes 0.1.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
