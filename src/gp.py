@@ -234,8 +234,14 @@ class GP(object):
             :math:`n\times n` matrix
 
         """
-        Li = self.inv_Lxx
-        return np.dot(Li.T, Li)
+        try:
+            Li = self.inv_Lxx
+            Ki = np.dot(Li.T, Li)
+        except np.linalg.LinAlgError:
+            print ("gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
+                   "computing pseudo-inverse")
+            Ki = np.linalg.pinv(self.Kxx)
+        return Ki
 
     @memoprop
     def inv_Kxx_y(self):
