@@ -710,7 +710,7 @@ class GP(object):
             A list of functions to give an initial starting value for
             each parameter that is being fit. The functions should take
             no arguments, and return a float. If not specified, the
-            functions default to ``lambda: abs(numpy.random.norm())``.
+            functions default to ``lambda: abs(numpy.random.normal())``.
 
         nrestart : int (optional)
             Number of random restarts to use. The best parameters out of
@@ -735,7 +735,7 @@ class GP(object):
         # default for randf
         if randf is None:
             randf = tuple(
-                lambda: np.abs(np.random.norm())
+                lambda: np.abs(np.random.normal())
                 for p in params_to_fit if p)
 
         # figure out the indices of the params we are fitting
