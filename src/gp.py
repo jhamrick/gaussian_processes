@@ -4,6 +4,7 @@ import numpy as np
 import copy
 import matplotlib.pyplot as plt
 import scipy.optimize as optim
+import warnings
 
 
 def memoprop(f):
@@ -238,8 +239,10 @@ class GP(object):
             Li = self.inv_Lxx
             Ki = np.dot(Li.T, Li)
         except np.linalg.LinAlgError:
-            print ("gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
-                   "computing pseudo-inverse")
+            warnings.warn(
+                "gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
+                "computing pseudo-inverse",
+                RuntimeWarning)
             Ki = np.linalg.pinv(self.Kxx)
         return Ki
 
