@@ -1,5 +1,7 @@
 __all__ = ['Kernel']
 
+from functools import wraps
+
 
 class Kernel(object):
 
@@ -40,8 +42,7 @@ class Kernel(object):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def K(x1, x2, *params):
+    def K(self, x1, x2):
         r"""
         Kernel function evaluated at `x1` and `x2`.
 
@@ -60,8 +61,11 @@ class Kernel(object):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def jacobian(x1, x2, *params):
+    @wraps(K)
+    def __call__(self, x1, x2):
+        return self.K(x1, x2)
+
+    def jacobian(self, x1, x2):
         r"""
         Jacobian of the kernel function evaluated at `x1` and `x2`.
 
@@ -81,8 +85,7 @@ class Kernel(object):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def hessian(x1, x2, *params):
+    def hessian(self, x1, x2):
         r"""
         Hessian of the kernel function evaluated at `x1` and `x2`.
 
