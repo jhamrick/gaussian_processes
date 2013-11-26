@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+from Cython.Build import cythonize
 
 setup(
     name='gaussian_processes',
@@ -11,6 +12,7 @@ setup(
     url='https://github.com/jhamrick/gaussian_processes',
     packages=['kernels'],
     py_modules=['gp'],
+    ext_modules=cythonize("src/gp/kernels/*.pyx"),
     package_dir={'': 'src'},
     keywords='gp kernel statistics',
     classifiers=[
