@@ -19,9 +19,14 @@ clean:
 	rm -f MANIFEST
 	rm -f README
 	rm -f *.pyc
+	rm -f gp/kernels/*.c
+	rm -f gp/kernels/*.so
+
+cython:
+	$(PYCMD) build_ext --inplace
 
 test:
-	nosetests --nologcapture
+	nosetests
 
 gh-pages:
 	make clean || true
