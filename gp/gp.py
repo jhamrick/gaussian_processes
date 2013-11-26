@@ -7,7 +7,7 @@ import scipy.optimize as optim
 import warnings
 
 
-def memoize(f):
+def memoprop(f):
     """
     Memoized property.
 
@@ -17,14 +17,18 @@ def memoize(f):
     of the property.
 
     """
-    def __init__(self, func):
-        self._func = func
-        self.__name__ = func.__name__
+    fname = f.__name__
 
-    def __get__(self, obj, klass):
-        result = self._func(obj)
-        obj.__dict__[self.__name__] = result
-        return result
+    def fget(self):
+        if fname not in self._memoized:
+            self._memoized[fname] = f(self)
+        return self._memoized[fname]
+
+    def fdel(self):
+        del self._memoized[fname]
+
+    prop = property(fget=fget, fdel=fdel, doc=f.__doc__)
+    return prop
 
 
 class GP(object):
@@ -49,6 +53,7 @@ class GP(object):
         Initialize the GP.
 
         """
+        self._memoized = {}
 
         #: Kernel for the gaussian process, of type
         #: :class:`kernels.Kernel`
@@ -72,6 +77,14 @@ class GP(object):
         """
         return self._x
 
+    @x.setter
+    def x(self, val):
+        self._memoized = {}
+        self._x = val.copy()
+        self.n, self.d = self.x.shape
+        if self.d != 1:
+            raise NotImplementedError("dimensions > 1 not currently supported")
+
     @property
     def y(self):
         r"""
@@ -86,6 +99,13 @@ class GP(object):
         """
         return self._y
 
+    @y.setter
+    def y(self, val):
+        self._memoized = {}
+        self._y = val.copy()
+        if self.y.shape != (self.n, 1):
+            raise ValueError("invalid shape for y: %s" % str(self.y.shape))
+
     @property
     def s(self):
         r"""
@@ -98,6 +118,11 @@ class GP(object):
 
         """
         return self._s
+
+    @s.setter
+    def s(self, val):
+        self._memoized = {}
+        self._s = val
 
     @property
     def params(self):
@@ -113,7 +138,16 @@ class GP(object):
         """
         return tuple(list(self.K.params) + [self._s])
 
-    def copy(self, **kwargs):
+    @params.setter
+    def params(self, val):
+        params = self.params
+        if params[:-1] != val[:-1]:
+            self._memoized = {}
+            self.K.params = val[:-1]
+        if params[-1] != val[-1]:
+            self.s = val[-1]
+
+    def copy(self):
         """
         Create a copy of the gaussian process object.
 
@@ -123,15 +157,11 @@ class GP(object):
             New gaussian process object
 
         """
-        K = kwargs.get('K', self.K.copy())
-        x = kwargs.get('x', self.x)
-        y = kwargs.get('y', self.y)
-        s = kwargs.get('s', self.s)
-
-        new_gp = GP(K, x, y, s=s)
+        new_gp = GP(self.K.copy(), self.x, self.y, s=self.s)
+        new_gp._memoized = copy.deepcopy(self._memoized)
         return new_gp
 
-    @memoize
+    @memoprop
     def Kxx(self):
         r"""
         Kernel covariance matrix :math:`\mathbf{K}_{xx}`.
@@ -152,7 +182,7 @@ class GP(object):
         is the Dirac delta function.
 
         """
-        x, s = self._x, self._s
+        x, s = self._x[:, 0], self._s
         K = self.K(x, x)
         K += np.eye(x.size) * (s ** 2)
         if np.isnan(K).any():
@@ -160,7 +190,7 @@ class GP(object):
             raise ArithmeticError("Kxx contains invalid values")
         return K
 
-    @memoize
+    @memoprop
     def Lxx(self):
         r"""
         Cholesky decomposition of the kernel covariance matrix.
@@ -178,7 +208,7 @@ class GP(object):
         """
         return np.linalg.cholesky(self.Kxx)
 
-    @memoize
+    @memoprop
     def inv_Lxx(self):
         r"""
         Inverse cholesky decomposition of the kernel covariance matrix.
@@ -197,7 +227,7 @@ class GP(object):
         """
         return np.linalg.inv(self.Lxx)
 
-    @memoize
+    @memoprop
     def inv_Kxx(self):
         r"""
         Inverse kernel covariance matrix, :math:`\mathbf{K}_{xx}^{-1}`.
@@ -219,7 +249,7 @@ class GP(object):
             Ki = np.linalg.pinv(self.Kxx)
         return Ki
 
-    @memoize
+    @memoprop
     def inv_Kxx_y(self):
         r"""
         Dot product of the inverse kernel covariance matrix and of
@@ -237,7 +267,7 @@ class GP(object):
         """
         return np.dot(self.inv_Kxx, self._y)
 
-    @memoize
+    @memoprop
     def log_lh(self):
         r"""
         Marginal log likelihood.
@@ -275,7 +305,7 @@ class GP(object):
         llh = data_fit + complexity_penalty + constant
         return llh
 
-    @memoize
+    @memoprop
     def lh(self):
         r"""
         Marginal likelihood.
@@ -300,7 +330,7 @@ class GP(object):
         """
         return np.exp(self.log_lh)
 
-    @memoize
+    @memoprop
     def dloglh_dtheta(self):
         r"""
         Derivative of the marginal log likelihood.
@@ -324,7 +354,7 @@ class GP(object):
 
         """
 
-        x, y = self._x, self._y
+        x, y = self._x[:, 0], self._y
         try:
             Ki = self.inv_Kxx
         except np.linalg.LinAlgError:
@@ -346,7 +376,7 @@ class GP(object):
 
         return dloglh
 
-    @memoize
+    @memoprop
     def dlh_dtheta(self):
         r"""
         Derivative of the marginal likelihood.
@@ -365,7 +395,7 @@ class GP(object):
 
         """
 
-        x, y, K, Ki = self._x, self._y, self.Kxx, self.inv_Kxx
+        x, y, K, Ki = self._x[:, 0], self._y, self.Kxx, self.inv_Kxx
         Kiy = self.inv_Kxx_y
         nparam = len(self.params)
 
@@ -383,7 +413,7 @@ class GP(object):
 
         return dlh
 
-    @memoize
+    @memoprop
     def d2lh_dtheta2(self):
         r"""
         Second derivative of the marginal likelihood.
@@ -402,7 +432,7 @@ class GP(object):
 
         """
 
-        y, x, K, Ki = self._y, self._x, self.Kxx, self.inv_Kxx
+        y, x, K, Ki = self._y, self._x[:, 0], self.Kxx, self.inv_Kxx
         Kiy = self.inv_Kxx_y
         nparam = len(self.params)
 
@@ -462,7 +492,10 @@ class GP(object):
         :math:`\mathbf{x^*}` are the new locations.
 
         """
-        return self.K(xo, xo)
+        m, d = xo.shape
+        if d != self.d:
+            raise ValueError("wrong number of dimensions: %d" % d)
+        return self.K(xo[:, 0], xo[:, 0])
 
     def Kxxo(self, xo):
         r"""
@@ -486,7 +519,10 @@ class GP(object):
         :math:`\mathbf{x^*}` are the new sample locations.
 
         """
-        return self.K(self._x, xo)
+        m, d = xo.shape
+        if d != self.d:
+            raise ValueError("wrong number of dimensions: %d" % d)
+        return self.K(self._x[:, 0], xo[:, 0])
 
     def Kxox(self, xo):
         r"""
@@ -510,7 +546,10 @@ class GP(object):
         :math:`\mathbf{x}` are the given locations
 
         """
-        return self.K(xo, self._x)
+        m, d = xo.shape
+        if d != self.d:
+            raise ValueError("wrong number of dimensions: %d" % d)
+        return self.K(xo[:, 0], self._x[:, 0])
 
     def mean(self, xo):
         r"""
@@ -591,12 +630,14 @@ class GP(object):
 
         """
 
-        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
+        x, y, inv_Kxx = self._x[:, 0], self._y, self.inv_Kxx
         Kxox = self.Kxox(xo)
 
         # dimensions
-        n, d = x.shape
+        n, = x.shape
         m, d = xo.shape
+        if d != self.d:
+            raise ValueError("invalid number of dimensions for xo: %d" % d)
 
         # compute kernel derivatives for s
         dKxox_ds = np.zeros((1, m, n))
@@ -604,7 +645,7 @@ class GP(object):
 
         # all kernel partial derivatives
         dKxox_dtheta = np.concatenate([
-            self.K.jacobian(xo, x), dKxox_ds], axis=0)
+            self.K.jacobian(xo[:, 0], x), dKxox_ds], axis=0)
         dKxx_dtheta = np.concatenate([
             self.K.jacobian(x, x), dKxx_ds], axis=0)
 
