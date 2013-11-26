@@ -15,6 +15,7 @@ setup(
     ext_modules=cythonize(
         "gp/kernels/*.pyx",
         include_path=[np.get_include()]),
+    include_dirs=[np.get_include()],
     keywords='gp kernel statistics',
     classifiers=[
         "Development Status :: 3 - Alpha",
