@@ -3,13 +3,8 @@ __all__ = ['GaussianKernel']
 import numpy as np
 import sympy as sym
 
-from numpy import exp, sqrt, pi
 from functools import wraps
-from . import Kernel
-
-from util import staticlazyjit
-staticlazyjit_mat = staticlazyjit(
-    'f8[:,:](f8[:], f8[:], f8, f8)', warn=False)
+from . import Kernel, gaussian_c
 
 
 class GaussianKernel(Kernel):
@@ -69,93 +64,59 @@ class GaussianKernel(Kernel):
         f = h2 * (1. / sym.sqrt(2*sym.pi*w2)) * sym.exp(-d2 / (2.0 * w2))
         return f
 
-    @staticlazyjit_mat
-    @wraps(Kernel._K)
-    def _K(x1, x2, h, w):
-        Kxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                Kxx[i, j] = 0.5*sqrt(2)*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*sqrt(w**2))
-        return Kxx
+    @wraps(Kernel.K)
+    def K(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.K(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit('f8[:,:,:](f8[:], f8[:], f8, f8)', warn=False)
-    @wraps(Kernel._jacobian)
-    def _jacobian(x1, x2, h, w):
-        dKxx = np.empty((2, x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[0, i, j] = sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*sqrt(w**2))
-                dKxx[1, i, j] = 0.5*sqrt(2)*d**2*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - 0.5*sqrt(2)*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-        return dKxx
+    @wraps(Kernel.jacobian)
+    def jacobian(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((2, x1.size, x2.size))
+        gaussian_c.jacobian(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit('f8[:,:,:](f8[:], f8[:], f8, f8)', warn=False)
-    @wraps(Kernel._hessian)
-    def _hessian(x1, x2, h, w):
-        dKxx = np.empty((2, 2, x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                # h
-                dKxx[0, 0, i, j] = sqrt(2)*exp(-0.5*d**2/w**2)/(sqrt(pi)*sqrt(w**2))
-                dKxx[0, 1, i, j] = sqrt(2)*d**2*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-                # w
-                dKxx[1, 0, i, j] = sqrt(2)*d**2*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-                dKxx[1, 1, i, j] = 0.5*sqrt(2)*d**4*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**6*sqrt(w**2)) - 2.5*sqrt(2)*d**2*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**4*sqrt(w**2)) + sqrt(2)*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**2*sqrt(w**2))
+    @wraps(Kernel.hessian)
+    def hessian(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((2, 2, x1.size, x2.size))
+        gaussian_c.hessian(out, x1, x2, self.h, self.w)
+        return out
 
-        return dKxx
+    def dK_dh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dh(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit_mat
-    def _dK_dh(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*sqrt(w**2))
-        return dKxx
+    def dK_dw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dw(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit_mat
-    def _dK_dw(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 0.5*sqrt(2)*d**2*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - 0.5*sqrt(2)*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-        return dKxx
+    def d2K_dhdh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dhdh(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dhdh(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = sqrt(2)*exp(-0.5*d**2/w**2)/(sqrt(pi)*sqrt(w**2))
-        return dKxx
+    def d2K_dhdw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dhdw(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dhdw(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = sqrt(2)*d**2*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-        return dKxx
+    def d2K_dwdh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dwdh(out, x1, x2, self.h, self.w)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dwdh(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = sqrt(2)*d**2*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**3*sqrt(w**2)) - sqrt(2)*h*exp(-0.5*d**2/w**2)/(sqrt(pi)*w*sqrt(w**2))
-        return dKxx
-
-    @staticlazyjit_mat
-    def _d2K_dwdw(x1, x2, h, w):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 0.5*sqrt(2)*d**4*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**6*sqrt(w**2)) - 2.5*sqrt(2)*d**2*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**4*sqrt(w**2)) + sqrt(2)*h**2*exp(-0.5*d**2/w**2)/(sqrt(pi)*w**2*sqrt(w**2))
-        return dKxx
+    def d2K_dwdw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        gaussian_c.dK_dwdw(out, x1, x2, self.h, self.w)
+        return out
