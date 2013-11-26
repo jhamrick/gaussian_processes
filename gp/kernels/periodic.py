@@ -3,13 +3,8 @@ __all__ = ['PeriodicKernel']
 import numpy as np
 import sympy as sym
 
-from numpy import exp, sin, cos
 from functools import wraps
-from . import Kernel
-
-from util import staticlazyjit
-staticlazyjit_mat = staticlazyjit(
-    'f8[:,:](f8[:], f8[:], f8, f8, f8)', warn=False)
+from . import Kernel, periodic_c
 
 
 class PeriodicKernel(Kernel):
@@ -72,154 +67,95 @@ class PeriodicKernel(Kernel):
         f = h2 * sym.exp(-2.*(sym.sin(d / (2.*p)) ** 2) / w2)
         return f
 
-    @staticlazyjit_mat
-    @wraps(Kernel._K)
-    def _K(x1, x2, h, w, p):
-        Kxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                Kxx[i, j] = h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)
-        return Kxx
+    @wraps(Kernel.K)
+    def K(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.K(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit('f8[:,:,:](f8[:], f8[:], f8, f8, f8)', warn=False)
-    @wraps(Kernel._jacobian)
-    def _jacobian(x1, x2, h, w, p):
-        dKxx = np.empty((3, x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[0, i, j] = 2.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)
-                dKxx[1, i, j] = 4.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-                dKxx[2, i, j] = 2.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-        return dKxx
+    @wraps(Kernel.jacobian)
+    def jacobian(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((3, x1.size, x2.size))
+        periodic_c.jacobian(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit('f8[:,:,:,:](f8[:], f8[:], f8, f8, f8)', warn=False)
-    @wraps(Kernel._hessian)
-    def _hessian(x1, x2, h, w, p):
-        dKxx = np.empty((3, 3, x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                # h
-                dKxx[0, 0, i, j] = 2.0*exp(-2.0*sin(0.5*d/p)**2/w**2)
-                dKxx[0, 1, i, j] = 8.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-                dKxx[0, 2, i, j] = 4.0*d*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-                # w
-                dKxx[1, 0, i, j] = 8.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-                dKxx[1, 1, i, j] = -12.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**4 + 16.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**4/w**6
-                dKxx[1, 2, i, j] = -4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**3) + 8.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**3*cos(0.5*d/p)/(p**2*w**5)
-                # p
-                dKxx[2, 0, i, j] = 4.0*d*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-                dKxx[2, 1, i, j] = -4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**3) + 8.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**3*cos(0.5*d/p)/(p**2*w**5)
-                dKxx[2, 2, i, j]= d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/(p**4*w**2) - 1.0*d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*cos(0.5*d/p)**2/(p**4*w**2) + 4.0*d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2*cos(0.5*d/p)**2/(p**4*w**4) - 4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**3*w**2)
+    @wraps(Kernel.hessian)
+    def hessian(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((3, 3, x1.size, x2.size))
+        periodic_c.hessian(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-        return dKxx
+    def dK_dh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dh(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _dK_dh(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 2.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)
-        return dKxx
+    def dK_dw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dw(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _dK_dw(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 4.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-        return dKxx
+    def dK_dp(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dp(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _dK_dp(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 2.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-        return dKxx
+    def d2K_dhdh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dhdh(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dhdh(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 2.0*exp(-2.0*sin(0.5*d/p)**2/w**2)
-        return dKxx
+    def d2K_dhdw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dhdw(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dhdw(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 8.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-        return dKxx
+    def d2K_dhdp(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dhdp(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dhdp(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 4.0*d*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-        return dKxx
+    def d2K_dwdh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dwdh(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dwdh(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 8.0*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**3
-        return dKxx
+    def d2K_dwdw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dwdw(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dwdw(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = -12.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/w**4 + 16.0*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**4/w**6
-        return dKxx
+    def d2K_dwdp(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dwdp(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dwdp(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = -4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**3) + 8.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**3*cos(0.5*d/p)/(p**2*w**5)
-        return dKxx
+    def d2K_dpdh(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dpdh(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dpdh(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = 4.0*d*h*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**2)
-        return dKxx
+    def d2K_dpdw(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dpdw(out, x1, x2, self.h, self.w, self.p)
+        return out
 
-    @staticlazyjit_mat
-    def _d2K_dpdw(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = -4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**2*w**3) + 8.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**3*cos(0.5*d/p)/(p**2*w**5)
-        return dKxx
-
-    @staticlazyjit_mat
-    def _d2K_dpdp(x1, x2, h, w, p):
-        dKxx = np.empty((x1.size, x2.size))
-        for i in xrange(x1.size):
-            for j in xrange(x2.size):
-                d = x1[i] - x2[j]
-                dKxx[i, j] = d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2/(p**4*w**2) - 1.0*d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*cos(0.5*d/p)**2/(p**4*w**2) + 4.0*d**2*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)**2*cos(0.5*d/p)**2/(p**4*w**4) - 4.0*d*h**2*exp(-2.0*sin(0.5*d/p)**2/w**2)*sin(0.5*d/p)*cos(0.5*d/p)/(p**3*w**2)
-        return dKxx
+    def d2K_dpdp(self, x1, x2, out=None):
+        if out is None:
+            out = np.empty((x1.size, x2.size))
+        periodic_c.dK_dpdp(out, x1, x2, self.h, self.w, self.p)
+        return out
