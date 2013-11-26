@@ -2,8 +2,8 @@ import numpy as np
 
 
 opt = {
-    'n_big_test_iters': 20,
-    'n_small_test_iters': 5
+    'n_big_test_iters': 100,
+    'n_small_test_iters': 10
 }
 
 

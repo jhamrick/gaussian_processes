@@ -4,8 +4,8 @@ from numpy import dot
 np.seterr(all='raise')
 np.random.seed(2348)
 
-from kernels import GaussianKernel as kernel
 from gp import GP
+from gp import GaussianKernel as kernel
 from util import opt, rand_params, approx_deriv
 
 EPS = np.finfo(float).eps
@@ -168,12 +168,11 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_mean(gp, y)
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_big
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_big
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError
 
     def test_inv(self):
@@ -185,12 +184,11 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_inv(gp)
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_small
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_small
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError
 
     def test_dloglh(self):
@@ -202,12 +200,11 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_dloglh(gp, params + (s,))
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_big
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_big
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError
 
     def test_dlh(self):
@@ -219,12 +216,11 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_dlh(gp, params + (s,))
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_big
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_big
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError
 
     def test_d2lh(self):
@@ -236,12 +232,11 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_d2lh(gp, params + (s,))
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_big
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_big
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError
 
     def test_dm(self):
@@ -254,10 +249,9 @@ class TestGP(object):
             gp = GP(kernel(*params), x, y, s=s)
             try:
                 self.check_dm(xo, gp, params + (s,))
-            except:
-                traceback.print_exc()
+            except AssertionError:
                 failures += 1
-        ffail = failures / self.N_big
-        if ffail > 0.1:
-            print "%f%% failed" % ffail
+        pfail = 100 * failures / self.N_big
+        if pfail > 10:
+            print "%.1f%% failed" % pfail
             raise AssertionError

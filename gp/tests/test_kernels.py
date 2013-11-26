@@ -2,7 +2,7 @@ import scipy.stats
 import numpy as np
 np.seterr(all='raise')
 
-from kernels import GaussianKernel, PeriodicKernel
+from gp import GaussianKernel, PeriodicKernel
 from util import opt, rand_params, approx_deriv
 
 EPS = np.finfo(float).eps
