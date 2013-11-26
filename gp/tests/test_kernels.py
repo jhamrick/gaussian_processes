@@ -1,6 +1,7 @@
 import scipy.stats
 import numpy as np
 np.seterr(all='raise')
+np.random.seed(2348)
 
 from gp import GaussianKernel, PeriodicKernel
 from util import opt, rand_params, approx_deriv
@@ -15,7 +16,7 @@ class TestKernels(object):
     def __init__(self):
         self.N_big = opt['n_big_test_iters']
         self.N_small = opt['n_small_test_iters']
-        self.thresh = np.sqrt(EPS) * 10
+        self.thresh = 1e-5
 
     def check_params(self, kernel, params):
         k = kernel(*params)
@@ -30,7 +31,12 @@ class TestKernels(object):
         print "Kernel parameters:", kernel.params
 
         h, w = params
-        pdx = scipy.stats.norm.pdf(dx, loc=0, scale=w)
+        pdx = np.empty(dx.shape)
+        for i, v in enumerate(dx.flat):
+            try:
+                pdx.flat[i] = scipy.stats.norm.pdf(v, loc=0, scale=w)
+            except FloatingPointError:
+                pdx.flat[i] = 0.0
         pdx *= h ** 2
 
         diff = abs(pdx - K)
@@ -111,7 +117,6 @@ class TestKernels(object):
             yield self.check_params, PeriodicKernel, params
 
     def test_gaussian_K(self):
-        """Test stats.gaussian_kernel output matrix"""
         x = np.linspace(-2, 2, 10)
         dx = x[:, None] - x[None, :]
         for i in xrange(self.N_big):
@@ -119,7 +124,6 @@ class TestKernels(object):
             yield (self.check_gaussian_K, x, dx, params)
 
     def test_periodic_K(self):
-        """Test stats.periodic_kernel output matrix"""
         x = np.linspace(-2*np.pi, 2*np.pi, 16)
         dx = x[:, None] - x[None, :]
         for i in xrange(self.N_big):
