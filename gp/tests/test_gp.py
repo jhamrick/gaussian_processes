@@ -2,6 +2,7 @@ import traceback
 import numpy as np
 from numpy import dot
 np.seterr(all='raise')
+np.random.seed(2348)
 
 from kernels import GaussianKernel as kernel
 from gp import GP

@@ -2,6 +2,7 @@
 
 from distutils.core import setup
 from Cython.Build import cythonize
+import numpy as np
 
 setup(
     name='gaussian_processes',
@@ -10,10 +11,10 @@ setup(
     author='Jessica B. Hamrick',
     author_email='jhamrick@berkeley.edu',
     url='https://github.com/jhamrick/gaussian_processes',
-    packages=['kernels'],
-    py_modules=['gp'],
-    ext_modules=cythonize("src/gp/kernels/*.pyx"),
-    package_dir={'': 'src'},
+    packages=['gp'],
+    ext_modules=cythonize(
+        "gp/kernels/*.pyx",
+        include_path=[np.get_include()]),
     keywords='gp kernel statistics',
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -24,7 +25,6 @@ setup(
     ],
     install_requires=[
         'numpy',
-        'numba',
         'sympy'
     ]
 )

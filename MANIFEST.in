@@ -4,4 +4,5 @@ include COPYING.txt
 include VERSION.txt
 include src/gp.py
 recursive-include src/kernels *.py
+recursive-include src/kernels *.pyx
 recursive-include src/tests *.py

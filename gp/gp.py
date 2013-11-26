@@ -7,7 +7,7 @@ import scipy.optimize as optim
 import warnings
 
 
-def memoprop(f):
+def memoize(f):
     """
     Memoized property.
 
@@ -17,18 +17,14 @@ def memoprop(f):
     of the property.
 
     """
-    fname = f.__name__
+    def __init__(self, func):
+        self._func = func
+        self.__name__ = func.__name__
 
-    def fget(self):
-        if fname not in self._memoized:
-            self._memoized[fname] = f(self)
-        return self._memoized[fname]
-
-    def fdel(self):
-        del self._memoized[fname]
-
-    prop = property(fget=fget, fdel=fdel, doc=f.__doc__)
-    return prop
+    def __get__(self, obj, klass):
+        result = self._func(obj)
+        obj.__dict__[self.__name__] = result
+        return result
 
 
 class GP(object):
@@ -53,7 +49,6 @@ class GP(object):
         Initialize the GP.
 
         """
-        self._memoized = {}
 
         #: Kernel for the gaussian process, of type
         #: :class:`kernels.Kernel`
@@ -77,12 +72,6 @@ class GP(object):
         """
         return self._x
 
-    @x.setter
-    def x(self, val):
-        assert val.ndim == 2, val.ndim
-        self._memoized = {}
-        self._x = val.copy()
-
     @property
     def y(self):
         r"""
@@ -97,12 +86,6 @@ class GP(object):
         """
         return self._y
 
-    @y.setter
-    def y(self, val):
-        assert val.ndim == 2, val.ndim
-        self._memoized = {}
-        self._y = val.copy()
-
     @property
     def s(self):
         r"""
@@ -115,11 +98,6 @@ class GP(object):
 
         """
         return self._s
-
-    @s.setter
-    def s(self, val):
-        self._memoized = {}
-        self._s = val
 
     @property
     def params(self):
@@ -135,16 +113,7 @@ class GP(object):
         """
         return tuple(list(self.K.params) + [self._s])
 
-    @params.setter
-    def params(self, val):
-        params = self.params
-        if params[:-1] != val[:-1]:
-            self._memoized = {}
-            self.K.params = val[:-1]
-        if params[-1] != val[-1]:
-            self.s = val[-1]
-
-    def copy(self):
+    def copy(self, **kwargs):
         """
         Create a copy of the gaussian process object.
 
@@ -154,11 +123,15 @@ class GP(object):
             New gaussian process object
 
         """
-        new_gp = GP(self.K.copy(), self.x, self.y, s=self.s)
-        new_gp._memoized = copy.deepcopy(self._memoized)
+        K = kwargs.get('K', self.K.copy())
+        x = kwargs.get('x', self.x)
+        y = kwargs.get('y', self.y)
+        s = kwargs.get('s', self.s)
+
+        new_gp = GP(K, x, y, s=s)
         return new_gp
 
-    @memoprop
+    @memoize
     def Kxx(self):
         r"""
         Kernel covariance matrix :math:`\mathbf{K}_{xx}`.
@@ -187,7 +160,7 @@ class GP(object):
             raise ArithmeticError("Kxx contains invalid values")
         return K
 
-    @memoprop
+    @memoize
     def Lxx(self):
         r"""
         Cholesky decomposition of the kernel covariance matrix.
@@ -205,7 +178,7 @@ class GP(object):
         """
         return np.linalg.cholesky(self.Kxx)
 
-    @memoprop
+    @memoize
     def inv_Lxx(self):
         r"""
         Inverse cholesky decomposition of the kernel covariance matrix.
@@ -224,7 +197,7 @@ class GP(object):
         """
         return np.linalg.inv(self.Lxx)
 
-    @memoprop
+    @memoize
     def inv_Kxx(self):
         r"""
         Inverse kernel covariance matrix, :math:`\mathbf{K}_{xx}^{-1}`.
@@ -246,7 +219,7 @@ class GP(object):
             Ki = np.linalg.pinv(self.Kxx)
         return Ki
 
-    @memoprop
+    @memoize
     def inv_Kxx_y(self):
         r"""
         Dot product of the inverse kernel covariance matrix and of
@@ -264,7 +237,7 @@ class GP(object):
         """
         return np.dot(self.inv_Kxx, self._y)
 
-    @memoprop
+    @memoize
     def log_lh(self):
         r"""
         Marginal log likelihood.
@@ -302,7 +275,7 @@ class GP(object):
         llh = data_fit + complexity_penalty + constant
         return llh
 
-    @memoprop
+    @memoize
     def lh(self):
         r"""
         Marginal likelihood.
@@ -327,7 +300,7 @@ class GP(object):
         """
         return np.exp(self.log_lh)
 
-    @memoprop
+    @memoize
     def dloglh_dtheta(self):
         r"""
         Derivative of the marginal log likelihood.
@@ -373,7 +346,7 @@ class GP(object):
 
         return dloglh
 
-    @memoprop
+    @memoize
     def dlh_dtheta(self):
         r"""
         Derivative of the marginal likelihood.
@@ -410,7 +383,7 @@ class GP(object):
 
         return dlh
 
-    @memoprop
+    @memoize
     def d2lh_dtheta2(self):
         r"""
         Second derivative of the marginal likelihood.
