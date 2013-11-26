@@ -3,6 +3,8 @@ __all__ = ["GP"]
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+import scipy.optimize as optim
+import warnings
 
 
 def memoprop(f):
@@ -233,8 +235,16 @@ class GP(object):
             :math:`n\times n` matrix
 
         """
-        Li = self.inv_Lxx
-        return np.dot(Li.T, Li)
+        try:
+            Li = self.inv_Lxx
+            Ki = np.dot(Li.T, Li)
+        except np.linalg.LinAlgError:
+            warnings.warn(
+                "gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
+                "computing pseudo-inverse",
+                RuntimeWarning)
+            Ki = np.linalg.pinv(self.Kxx)
+        return Ki
 
     @memoprop
     def inv_Kxx_y(self):
@@ -679,3 +689,114 @@ class GP(object):
         ax.plot(X, mean, lw=2, color=color)
         ax.plot(x, y, 'o', ms=7, color=markercolor)
         ax.set_xlim(*xlim)
+
+    def fit_MLII(self, params_to_fit, bounds=None,
+                 randf=None, nrestart=5, verbose=False):
+        """
+        Fit parameters of the gaussian process using MLII (maximum
+        likelihood) estimation.
+
+        Note that this method modifies the gaussian process in
+        place. After the method is run, the `GP` object will have new
+        parameters set to the best ones found during the optimization.
+
+        The optimization algorithm used is L-BFGS-B.
+
+        Parameters
+        ----------
+        params_to_fit : boolean array_like
+            A list of booleans corresponding to the gaussian process
+            parameters, indicating which parameters should be
+            fit. Parameters which are not fit keep their current value.
+
+        bounds : list of tuples (optional)
+            The upper and lower bounds for each parameter that is being
+            fit; use ``None`` to specify no bound. If not specified,
+            the bounds default to ``(EPS, None)``, where
+            ``EPS=numpy.finfo(float).eps``.
+
+        randf : list of functions (optional)
+            A list of functions to give an initial starting value for
+            each parameter that is being fit. The functions should take
+            no arguments, and return a float. If not specified, the
+            functions default to ``lambda: abs(numpy.random.normal())``.
+
+        nrestart : int (optional)
+            Number of random restarts to use. The best parameters out of
+            all the random restarts are used.
+
+        verbose : bool (optional)
+            Whether to print information about the optimization.
+
+        """
+
+        # original parameter list
+        params = list(self.params)
+        # boolean array of which parameters to fit
+        fitmask = np.array(params_to_fit, dtype='bool')
+
+        EPS = np.finfo(float).eps
+        # default for bounds
+        if bounds is None:
+            bounds = tuple(
+                (EPS, None)
+                for p in params_to_fit if p)
+        # default for randf
+        if randf is None:
+            randf = tuple(
+                lambda: np.abs(np.random.normal())
+                for p in params_to_fit if p)
+
+        # figure out the indices of the params we are fitting
+        j = 0
+        iparam = []
+        for i in xrange(len(params)):
+            if params_to_fit[i]:
+                iparam.append(j)
+                j += 1
+            else:
+                iparam.append(None)
+
+        # update the GP object with new parameter values
+        def new_params(theta):
+            th = np.array(theta).ravel()
+            out = [params[i] if j is None else th[j]
+                   for i, j in enumerate(iparam)]
+            return out
+
+        # negative log likelihood
+        def f(theta):
+            self.params = new_params(theta)
+            out = -self.log_lh
+            return out
+
+        # jacobian of the negative log likelihood
+        def df(theta):
+            self.params = new_params(theta)
+            out = -self.dloglh_dtheta[fitmask]
+            return out
+
+        def cb(theta):
+            print theta
+
+        # run the optimization a few times to find the best fit
+        args = np.empty((nrestart, len(bounds)))
+        fval = np.empty(nrestart)
+        for i in xrange(nrestart):
+            p0 = tuple(r() for r in randf)
+            self.params = new_params(p0)
+            if verbose:
+                print "      p0 = %s" % (p0,)
+            popt = optim.minimize(
+                fun=f, x0=p0, jac=df, method='L-BFGS-B', bounds=bounds)
+            args[i] = popt['x']
+            fval[i] = popt['fun']
+            if verbose:
+                print "      -MLL(%s) = %f" % (args[i], fval[i])
+
+        # choose the parameters that give the best MLL
+        if args is None or fval is None:
+            raise RuntimeError("Could not find MLII parameter estimates")
+
+        # update our parameters
+        self.params = new_params(args[np.argmin(fval)])
