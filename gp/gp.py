@@ -595,10 +595,8 @@ class GP(object):
         Kxox = self.Kxox(xo)
 
         # dimensions
-        n, = x.shape
-        m, d = xo.shape
-        if d != self.d:
-            raise ValueError("invalid number of dimensions for xo: %d" % d)
+        n = x.size
+        m = xo.size
 
         # compute kernel derivatives for s
         dKxox_ds = np.zeros((1, m, n))
@@ -613,7 +611,7 @@ class GP(object):
         # number of parameters
         n_p = dKxx_dtheta.shape[0]
 
-        dm = np.empty((n_p, m, 1))
+        dm = np.empty((n_p, m))
         for i in xrange(n_p):
             inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
             term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))

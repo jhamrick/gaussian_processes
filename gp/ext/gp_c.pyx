@@ -86,9 +86,9 @@ def d2lh_dtheta2(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, 
     for i in xrange(n+1):
         # first kernel derivatives
         if i < n:
-            dK[i] = dot(Ki, Kj[i])
+            dK[i] = Kj[i]
         else:
-            dK[i] = dot(Ki, eye(m) * 2 * s)
+            dK[i] = eye(m) * 2 * s
         
         dKi[i] = dot(-Ki, dot(dK[i], Ki))
 

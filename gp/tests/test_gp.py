@@ -36,6 +36,7 @@ class TestGP(object):
         self.N_small = opt['n_small_test_iters']
         self.thresh = 1e-5
         self.dtheta = 1e-5
+        self.pfail = 5
 
     def check_mean(self, gp, y):
         diff = np.abs(gp.mean(gp.x) - y)
@@ -176,7 +177,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_big
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -192,7 +193,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_small
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -208,7 +209,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_big
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -224,7 +225,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_big
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -240,7 +241,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_big
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -257,7 +258,7 @@ class TestGP(object):
             except AssertionError:
                 failures += 1
         pfail = 100 * failures / self.N_big
-        if pfail > 10:
+        if pfail > self.pfail:
             print "%.1f%% failed" % pfail
             raise AssertionError
 
@@ -275,7 +276,7 @@ class TestGP(object):
 
     def test_params_dtype(self):
         gp = make_gp()
-        assert type(gp.params) == DTYPE
+        assert gp.params.dtype == DTYPE
 
     def test_Kxx_dtype(self):
         gp = make_gp()
@@ -357,7 +358,7 @@ class TestGP(object):
 
     def test_x_shape(self):
         gp = make_gp()
-        assert gp.x.ndims == 1
+        assert gp.x.ndim == 1
 
     def test_y_shape(self):
         gp = make_gp()
@@ -416,7 +417,7 @@ class TestGP(object):
     def test_d2lh_dtheta2_shape(self):
         gp = make_gp()
         n_p = gp.params.size
-        assert gp.d2lh_dtheta2.shape == (n_p,)
+        assert gp.d2lh_dtheta2.shape == (n_p, n_p)
 
     def test_Kxoxo_shape(self):
         gp = make_gp()

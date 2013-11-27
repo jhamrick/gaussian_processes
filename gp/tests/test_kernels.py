@@ -20,7 +20,7 @@ class TestKernels(object):
 
     def check_params(self, kernel, params):
         k = kernel(*params)
-        if k.params != params:
+        if (k.params != np.array(params)).all():
             print k.params
             print params
             raise AssertionError("parameters do not match")
