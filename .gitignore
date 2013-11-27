@@ -2,5 +2,5 @@ MANIFEST
 build
 dist
 docs/_build
-gp/kernels/*.c
-gp/kernels/*.so
+gp/ext/*.c
+gp/ext/*.so
