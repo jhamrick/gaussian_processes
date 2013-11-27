@@ -44,6 +44,24 @@ class TestKernels(object):
             print self.thresh, diff
             raise AssertionError("invalid gaussian kernel matrix")
 
+    def check_gaussian_sym_K(self, x, dx, params):
+        kernel = GaussianKernel(*params)
+        K = kernel(x, x)
+        sym_K = kernel.sym_K
+        Ks = np.empty_like(K)
+        for i in xrange(x.size):
+            for j in xrange(x.size):
+                Ks[i, j] = sym_K.evalf(subs={
+                    'd': dx[i, j],
+                    'h': params[0],
+                    'w': params[1]
+                })
+
+        diff = abs(Ks - K)
+        if not (diff < self.thresh).all():
+            print self.thresh, diff
+            raise AssertionError("symbolic and computed kernels do not match")
+
     def check_periodic_K(self, x, dx, params):
         kernel = PeriodicKernel(*params)
         K = kernel(x, x)
@@ -56,6 +74,25 @@ class TestKernels(object):
         if not (diff < self.thresh).all():
             print self.thresh, diff
             raise AssertionError("invalid periodic kernel matrix")
+
+    def check_periodic_sym_K(self, x, dx, params):
+        kernel = PeriodicKernel(*params)
+        K = kernel(x, x)
+        sym_K = kernel.sym_K
+        Ks = np.empty_like(K)
+        for i in xrange(x.size):
+            for j in xrange(x.size):
+                Ks[i, j] = sym_K.evalf(subs={
+                    'd': dx[i, j],
+                    'h': params[0],
+                    'w': params[1],
+                    'p': params[2]
+                })
+
+        diff = abs(Ks - K)
+        if not (diff < self.thresh).all():
+            print self.thresh, diff
+            raise AssertionError("symbolic and computed kernels do not match")
 
     def check_jacobian(self, kernel, params, x):
         k = kernel(*params)
@@ -120,12 +157,28 @@ class TestKernels(object):
             params = rand_params('h', 'w')
             yield (self.check_gaussian_K, x, dx, params)
 
+    def test_gaussian_sym_K(self):
+        x = np.linspace(-2, 2, 10)
+        dx = x[:, None] - x[None, :]
+        yield (self.check_gaussian_sym_K, x, dx, (1, 1))
+        yield (self.check_gaussian_sym_K, x, dx, (1, 2))
+        yield (self.check_gaussian_sym_K, x, dx, (2, 1))
+        yield (self.check_gaussian_sym_K, x, dx, (0.5, 0.5))
+
     def test_periodic_K(self):
         x = np.linspace(-2*np.pi, 2*np.pi, 16)
         dx = x[:, None] - x[None, :]
         for i in xrange(self.N_big):
             params = rand_params('h', 'w', 'p')
             yield (self.check_periodic_K, x, dx, params)
+
+    def test_periodic_sym_K(self):
+        x = np.linspace(-2, 2, 10)
+        dx = x[:, None] - x[None, :]
+        yield (self.check_periodic_sym_K, x, dx, (1, 1, 1))
+        yield (self.check_periodic_sym_K, x, dx, (1, 2, 2))
+        yield (self.check_periodic_sym_K, x, dx, (2, 1, 0.5))
+        yield (self.check_periodic_sym_K, x, dx, (0.5, 0.5, 1))
 
     def test_gaussian_jacobian(self):
         x = np.linspace(-2, 2, 10)
