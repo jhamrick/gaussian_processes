@@ -45,7 +45,7 @@ class GP(object):
     K : :class:`kernels.Kernel`
         Kernel object
     x : numpy.ndarray
-        :math:`n\times d` array of input locations
+        :math:`n` array of input locations
     y : numpy.ndarray
         :math:`n\times 1` array of input observations
     s : number (default=0)
@@ -76,8 +76,8 @@ class GP(object):
         Returns
         -------
         x : numpy.ndarray
-            :math:`n\times d` array, where :math:`n` is the number of
-            locations and :math:`d` is the number of dimensions.
+            :math:`n` array, where :math:`n` is the number of
+            locations.
 
         """
         return self._x
@@ -449,7 +449,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -472,7 +472,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -496,7 +496,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -519,12 +519,12 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
         mean : numpy.ndarray
-            :math:`m\times d` array of predictive means
+            :math:`m` array of predictive means
 
         Notes
         -----
@@ -544,7 +544,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -573,12 +573,12 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
         dm_dtheta : numpy.ndarray
-            :math:`n_p\times m\times d` array, where :math:`n_p` is the
+            :math:`n_p\times m` array, where :math:`n_p` is the
             number of parameters (see `params`).
 
         Notes
@@ -622,11 +622,6 @@ class GP(object):
         """
 
         x, y = self._x, self._y
-        n, d = x.shape
-        if d != 1:
-            raise ValueError("data has too many dimensions")
-        x = x
-        y = y
 
         if ax is None:
             ax = plt.gca()
