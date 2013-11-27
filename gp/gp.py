@@ -10,6 +10,7 @@ from .ext import gp_c
 
 DTYPE = np.float64
 EPS = np.finfo(DTYPE).eps
+MIN = np.log(np.exp2(DTYPE(np.finfo(DTYPE).minexp + 4)))
 
 
 def memoprop(f):
@@ -333,7 +334,11 @@ class GP(object):
         where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
         """
-        return np.exp(self.log_lh)
+        llh = self.log_lh
+        if llh < MIN:
+            return 0
+        else:
+            return np.exp(self.log_lh)
 
     @memoprop
     def dloglh_dtheta(self):
