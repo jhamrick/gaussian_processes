@@ -3,8 +3,8 @@ import numpy as np
 np.seterr(all='raise')
 np.random.seed(2348)
 
-from gp import GaussianKernel, PeriodicKernel
-from util import opt, rand_params, approx_deriv
+from .. import GaussianKernel, PeriodicKernel
+from .util import opt, rand_params, approx_deriv
 
 EPS = np.finfo(float).eps
 
@@ -13,10 +13,10 @@ EPS = np.finfo(float).eps
 
 class TestKernels(object):
 
-    def __init__(self):
-        self.N_big = opt['n_big_test_iters']
-        self.N_small = opt['n_small_test_iters']
-        self.thresh = 1e-5
+    N_big = opt['n_big_test_iters']
+    N_small = opt['n_small_test_iters']
+    thresh = 1e-3
+    dtheta = 1e-5
 
     def check_params(self, kernel, params):
         k = kernel(*params)
@@ -60,17 +60,16 @@ class TestKernels(object):
     def check_jacobian(self, kernel, params, x):
         k = kernel(*params)
         jac = k.jacobian(x, x)
-        dtheta = self.thresh
 
         approx_jac = np.empty(jac.shape)
         for i in xrange(len(params)):
             p0 = list(params)
-            p0[i] -= dtheta
+            p0[i] -= self.dtheta
             p1 = list(params)
-            p1[i] += dtheta
+            p1[i] += self.dtheta
             k0 = kernel(*p0)(x, x)
             k1 = kernel(*p1)(x, x)
-            approx_jac[i] = approx_deriv(k0, k1, dtheta)
+            approx_jac[i] = approx_deriv(k0, k1, self.dtheta)
 
         diff = jac - approx_jac
         bad = np.abs(diff) > self.thresh
@@ -83,23 +82,21 @@ class TestKernels(object):
     def check_hessian(self, kernel, params, x):
         k = kernel(*params)
         hess = k.hessian(x, x)
-        dtheta = self.thresh
 
         approx_hess = np.empty(hess.shape)
         for i in xrange(len(params)):
             p0 = list(params)
             p1 = list(params)
-            p0[i] -= dtheta
-            p1[i] += dtheta
+            p0[i] -= self.dtheta
+            p1[i] += self.dtheta
             jac0 = kernel(*p0).jacobian(x, x)
             jac1 = kernel(*p1).jacobian(x, x)
-            approx_hess[:, i] = approx_deriv(jac0, jac1, dtheta)
+            approx_hess[:, i] = approx_deriv(jac0, jac1, self.dtheta)
 
         diff = hess - approx_hess
-        thresh = 1e-4
-        bad = np.abs(diff) > thresh
+        bad = np.abs(diff) > self.thresh
         if bad.any():
-            print "threshold:", thresh
+            print "threshold:", self.thresh
             print "worst err:", np.abs(diff).max()
             print "frac bad: ", (np.sum(bad) / float(bad.size))
             raise AssertionError("bad hessian")

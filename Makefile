@@ -26,7 +26,7 @@ cython:
 	$(PYCMD) build_ext --inplace
 
 test:
-	nosetests
+	py.test --cov gp
 
 gh-pages:
 	make clean || true

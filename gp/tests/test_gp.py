@@ -3,9 +3,9 @@ from numpy import dot
 np.seterr(all='raise')
 np.random.seed(2348)
 
-from gp import GP
-from gp import GaussianKernel as kernel
-from util import opt, rand_params, approx_deriv
+from .. import GP
+from .. import GaussianKernel as kernel
+from .util import opt, rand_params, approx_deriv
 
 DTYPE = np.float64
 
@@ -31,12 +31,11 @@ def make_gp():
 
 class TestGP(object):
 
-    def __init__(self):
-        self.N_big = opt['n_big_test_iters']
-        self.N_small = opt['n_small_test_iters']
-        self.thresh = 1e-5
-        self.dtheta = 1e-5
-        self.pfail = 5
+    N_big = opt['n_big_test_iters']
+    N_small = opt['n_small_test_iters']
+    thresh = 1e-5
+    dtheta = 1e-5
+    pfail = 5
 
     def check_mean(self, gp, y):
         diff = np.abs(gp.mean(gp.x) - y)

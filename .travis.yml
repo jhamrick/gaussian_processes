@@ -17,8 +17,13 @@ before_install:
 - export PATH=/home/travis/anaconda/bin:$PATH
 # Install packages
 install:
-- conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy nose scipy sympy matplotlib cython
+- conda install --yes pip python=$TRAVIS_PYTHON_VERSION numpy scipy sympy matplotlib cython
 - pip install -r requirements.txt --use-mirrors
+- pip install pytest pytest-cov coveralls
 - python setup.py build_ext --inplace
 
-script: nosetests
+script: 
+- py.test --cov gp
+
+after_success: 
+- coveralls

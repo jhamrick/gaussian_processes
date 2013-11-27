@@ -4,3 +4,4 @@ dist
 docs/_build
 gp/ext/*.c
 gp/ext/*.so
+.coverage
