@@ -47,10 +47,10 @@ class PeriodicKernel(Kernel):
 
         Returns
         -------
-        params : tuple ``(h, w, p)``
+        params : numpy.ndarray ``(h, w, p)``
 
         """
-        return (self.h, self.w, self.p)
+        return np.array([self.h, self.w, self.p], dtype=DTYPE)
 
     @params.setter
     def params(self, val):

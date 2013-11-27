@@ -44,10 +44,10 @@ class GaussianKernel(Kernel):
 
         Returns
         -------
-        params : tuple ``(h, w)``
+        params : numpy.ndarray ``(h, w)``
 
         """
-        return (self.h, self.w)
+        return np.array([self.h, self.w], dtype=DTYPE)
 
     @params.setter
     def params(self, val):
