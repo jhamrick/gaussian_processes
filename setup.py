@@ -30,7 +30,7 @@ setup(
     author='Jessica B. Hamrick',
     author_email='jhamrick@berkeley.edu',
     url='https://github.com/jhamrick/gaussian_processes',
-    packages=['gp'],
+    packages=['gp', 'gp.kernels', 'gp.ext', 'gp.tests'],
     ext_modules=cythonize(extensions),
     keywords='gp kernel statistics',
     classifiers=[
