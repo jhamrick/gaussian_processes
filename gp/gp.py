@@ -47,7 +47,7 @@ class GP(object):
     x : numpy.ndarray
         :math:`n` array of input locations
     y : numpy.ndarray
-        :math:`n\times 1` array of input observations
+        :math:`n` array of input observations
     s : number (default=0)
         Standard deviation of observation noise
 
@@ -96,7 +96,7 @@ class GP(object):
         Returns
         -------
         y : numpy.ndarray
-            :math:`n\times 1` array, where :math:`n` is the number of
+            :math:`n` array, where :math:`n` is the number of
             observations.
 
         """
@@ -271,7 +271,7 @@ class GP(object):
         Returns
         -------
         inv_Kxx_y : numpy.ndarray
-            :math:`n\times 1` array
+            :math:`n` array
 
         Notes
         -----
