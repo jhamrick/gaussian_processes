@@ -34,11 +34,7 @@ def K(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarra
             if e < MIN:
                 out[i, j] = 0
             else:
-                try:
-                    out[i, j] = c2*exp(e)
-                except FloatingPointError:
-                    print c2, e, MIN
-                    raise
+                out[i, j] = c2*exp(e)
 
 
 def jacobian(np.ndarray[DTYPE_t, ndim=3] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
