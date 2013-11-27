@@ -19,8 +19,8 @@ clean:
 	rm -f MANIFEST
 	rm -f README
 	rm -f *.pyc
-	rm -f gp/kernels/*.c
-	rm -f gp/kernels/*.so
+	rm -f gp/ext/*.c
+	rm -f gp/ext/*.so
 
 cython:
 	$(PYCMD) build_ext --inplace

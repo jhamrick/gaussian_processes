@@ -5,14 +5,12 @@ from __future__ import division
 import numpy as np
 cimport numpy as np
 
-cdef log = np.log
-cdef exp = np.exp
-cdef sqrt = np.sqrt
+from libc.math cimport log, exp, sqrt, M_PI
 
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
-cdef DTYPE_t SQRT_2_DIV_PI = sqrt(2.0 / np.pi)
+cdef DTYPE_t SQRT_2_DIV_PI = sqrt(2.0 / M_PI)
 cdef DTYPE_t MIN = log(np.exp2(DTYPE(np.finfo(DTYPE).minexp + 4)))
 
 
