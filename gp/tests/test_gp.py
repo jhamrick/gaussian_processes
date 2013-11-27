@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from numpy import dot
 np.seterr(all='raise')
@@ -456,3 +457,16 @@ class TestGP(object):
         m = xo.size
         n_p = gp.params.size
         assert gp.dm_dtheta(xo).shape == (n_p, m)
+
+    def test_del_Kxx(self):
+        gp = make_gp()
+        gp.Kxx
+        assert "Kxx" in gp._memoized
+        del gp.Kxx
+        assert "Kxx" not in gp._memoized
+
+    def test_set_y(self):
+        gp = make_gp()
+        y = gp.y.copy()
+        with pytest.raises(ValueError):
+            gp.y = y[:, None]

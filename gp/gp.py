@@ -189,9 +189,6 @@ class GP(object):
         x, s = self._x, self._s
         K = self.K(x, x)
         K += np.eye(x.size, dtype=DTYPE) * (s ** 2)
-        if np.isnan(K).any():
-            print self.K.params
-            raise ArithmeticError("Kxx contains invalid values")
         return K
 
     @memoprop
@@ -252,16 +249,8 @@ class GP(object):
             :math:`n\times n` matrix
 
         """
-        try:
-            Li = self.inv_Lxx
-            Ki = np.dot(Li.T, Li)
-        except np.linalg.LinAlgError:
-            warnings.warn(
-                "gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
-                "computing pseudo-inverse",
-                RuntimeWarning)
-            Ki = np.linalg.pinv(self.Kxx)
-        return Ki
+        Li = self.inv_Lxx
+        return np.dot(Li.T, Li)
 
     @memoprop
     def inv_Kxx_y(self):
@@ -304,11 +293,9 @@ class GP(object):
         where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
         """
-        y, K = self._y, self.Kxx
-        try:
-            Kiy = self.inv_Kxx_y
-        except np.linalg.LinAlgError:
-            return -np.inf
+        y = self._y
+        K = self.Kxx
+        Kiy = self.inv_Kxx_y
         return DTYPE(gp_c.log_lh(y, K, Kiy))
 
     @memoprop
@@ -366,18 +353,10 @@ class GP(object):
 
         y = self._y
         dloglh = np.empty(len(self.params))
-
-        try:
-            Ki = self.inv_Kxx
-        except np.linalg.LinAlgError:
-            dloglh.fill(-np.inf)
-            return dloglh
-
+        Ki = self.inv_Kxx
         Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
-
         gp_c.dloglh_dtheta(y, Ki, Kj, Kiy, self._s, dloglh)
-
         return dloglh
 
     @memoprop
@@ -401,17 +380,10 @@ class GP(object):
 
         y = self._y
         dlh = np.empty(len(self.params))
-
-        try:
-            Ki = self.inv_Kxx
-        except np.linalg.LinAlgError:
-            dlh.fill(0)
-            return dlh
-
+        Ki = self.inv_Kxx
         Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
         lh = self.lh
-
         gp_c.dlh_dtheta(y, Ki, Kj, Kiy, self._s, lh, dlh)
         return dlh
 
@@ -442,9 +414,7 @@ class GP(object):
         lh = self.lh
         dlh = self.dlh_dtheta
         d2lh = np.empty((len(self.params), len(self.params)))
-
         gp_c.d2lh_dtheta2(y, Ki, Kj, Kh, Kiy, self._s, lh, dlh, d2lh)
-
         return d2lh
 
     def Kxoxo(self, xo):
