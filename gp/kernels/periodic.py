@@ -4,7 +4,8 @@ import numpy as np
 import sympy as sym
 
 from functools import wraps
-from . import Kernel, periodic_c
+from gp.ext import periodic_c
+from . import Kernel
 
 DTYPE = np.float64
 

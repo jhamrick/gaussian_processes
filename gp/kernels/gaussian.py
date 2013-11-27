@@ -4,7 +4,8 @@ import numpy as np
 import sympy as sym
 
 from functools import wraps
-from . import Kernel, gaussian_c
+from gp.ext import gaussian_c
+from . import Kernel
 
 DTYPE = np.float64
 

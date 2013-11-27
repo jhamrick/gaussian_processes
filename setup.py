@@ -13,7 +13,7 @@ setup(
     url='https://github.com/jhamrick/gaussian_processes',
     packages=['gp'],
     ext_modules=cythonize(
-        "gp/kernels/*.pyx",
+        "gp/ext/*.pyx",
         include_path=[np.get_include()]),
     include_dirs=[np.get_include()],
     keywords='gp kernel statistics',

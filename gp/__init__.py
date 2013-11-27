@@ -1,5 +1,8 @@
-from gp import GP
-from kernels import *
+from . import ext
+__all__ = ["ext"]
 
-__all__ = ["GP"]
+from .gp import GP
+__all__.append("GP")
+
+from .kernels import *
 __all__.extend(kernels.__all__)
