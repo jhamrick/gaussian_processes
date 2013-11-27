@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import warnings
 
+from .ext import gp_c
+
 DTYPE = np.float64
 EPS = np.finfo(DTYPE).eps
 
@@ -84,9 +86,7 @@ class GP(object):
     def x(self, val):
         self._memoized = {}
         self._x = val.astype(DTYPE)
-        self.n, self.d = self.x.shape
-        if self.d != 1:
-            raise NotImplementedError("dimensions > 1 not currently supported")
+        self.n, = self.x.shape
 
     @property
     def y(self):
@@ -106,7 +106,7 @@ class GP(object):
     def y(self, val):
         self._memoized = {}
         self._y = val.astype(DTYPE)
-        if self.y.shape != (self.n, 1):
+        if self.y.shape != (self.n,):
             raise ValueError("invalid shape for y: %s" % str(self.y.shape))
 
     @property
@@ -134,17 +134,17 @@ class GP(object):
 
         Returns
         -------
-        params : tuple
+        params : numpy.ndarray
            Consists of the kernel's parameters, `self.K.params`, and the
            observation noise parameter, :math:`s`, in that order.
 
         """
-        return tuple(list(self.K.params) + [self._s])
+        return np.concatenate([self.K.params, [self._s]])
 
     @params.setter
     def params(self, val):
         params = self.params
-        if params[:-1] != val[:-1]:
+        if (params[:-1] != val[:-1]).any():
             self._memoized = {}
             self.K.params = val[:-1]
         if params[-1] != val[-1]:
@@ -185,13 +185,23 @@ class GP(object):
         is the Dirac delta function.
 
         """
-        x, s = self._x[:, 0], self._s
+        x, s = self._x, self._s
         K = self.K(x, x)
         K += np.eye(x.size, dtype=DTYPE) * (s ** 2)
         if np.isnan(K).any():
             print self.K.params
             raise ArithmeticError("Kxx contains invalid values")
         return K
+
+    @memoprop
+    def Kxx_J(self):
+        x = self._x
+        return self.K.jacobian(x, x)
+
+    @memoprop
+    def Kxx_H(self):
+        x = self._x
+        return self.K.hessian(x, x)
 
     @memoprop
     def Lxx(self):
@@ -294,19 +304,11 @@ class GP(object):
 
         """
         y, K = self._y, self.Kxx
-        sign, logdet = np.linalg.slogdet(K)
-        if sign != 1:
-            return -np.inf
         try:
             Kiy = self.inv_Kxx_y
         except np.linalg.LinAlgError:
             return -np.inf
-
-        data_fit = -0.5 * DTYPE(np.dot(y.T, Kiy))
-        complexity_penalty = -0.5 * logdet
-        constant = -0.5 * y.size * np.log(DTYPE(2 * np.pi))
-        llh = data_fit + complexity_penalty + constant
-        return llh
+        return DTYPE(gp_c.log_lh(y, K, Kiy))
 
     @memoprop
     def lh(self):
@@ -357,25 +359,19 @@ class GP(object):
 
         """
 
-        x, y = self._x[:, 0], self._y
+        y = self._y
+        dloglh = np.empty(len(self.params))
+
         try:
             Ki = self.inv_Kxx
         except np.linalg.LinAlgError:
-            return np.array([-np.inf for p in self.params])
+            dloglh.fill(-np.inf)
+            return dloglh
 
-        nparam = len(self.params)
+        Kj = self.Kxx_J
+        Kiy = self.inv_Kxx_y
 
-        # compute kernel jacobian
-        dK_dtheta = np.empty((nparam, y.size, y.size))
-        dK_dtheta[:-1] = self.K.jacobian(x, x)
-        dK_dtheta[-1] = np.eye(y.size) * 2 * self._s
-
-        dloglh = np.empty(nparam)
-        for i in xrange(dloglh.size):
-            k = np.dot(Ki, dK_dtheta[i])
-            t0 = 0.5 * np.dot(y.T, np.dot(k, self.inv_Kxx_y))
-            t1 = -0.5 * np.trace(k)
-            dloglh[i] = t0 + t1
+        gp_c.dloglh_dtheta(y, Ki, Kj, Kiy, self._s, dloglh)
 
         return dloglh
 
@@ -398,22 +394,20 @@ class GP(object):
 
         """
 
-        x, y, K, Ki = self._x[:, 0], self._y, self.Kxx, self.inv_Kxx
+        y = self._y
+        dlh = np.empty(len(self.params))
+
+        try:
+            Ki = self.inv_Kxx
+        except np.linalg.LinAlgError:
+            dlh.fill(0)
+            return dlh
+
+        Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
-        nparam = len(self.params)
-
-        dK_dtheta = np.empty((nparam, y.size, y.size))
-        dK_dtheta[:-1] = self.K.jacobian(x, x)
-        dK_dtheta[-1] = np.eye(y.size) * 2 * self._s
-
         lh = self.lh
-        dlh = np.empty(nparam)
-        for i in xrange(dlh.size):
-            KidK = np.dot(Ki, dK_dtheta[i])
-            t0 = np.dot(y.T, np.dot(KidK, Kiy))
-            t1 = np.trace(KidK)
-            dlh[i] = 0.5 * lh * (t0 - t1)
 
+        gp_c.dlh_dtheta(y, Ki, Kj, Kiy, self._s, lh, dlh)
         return dlh
 
     @memoprop
@@ -435,43 +429,16 @@ class GP(object):
 
         """
 
-        y, x, K, Ki = self._y, self._x[:, 0], self.Kxx, self.inv_Kxx
+        y = self._y
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
+        Kh = self.Kxx_H
         Kiy = self.inv_Kxx_y
-        nparam = len(self.params)
-
-        # first kernel derivatives
-        dK = np.empty((nparam, y.size, y.size))
-        dK[:-1] = self.K.jacobian(x, x)
-        dK[-1] = np.eye(y.size) * 2 * self._s
-        dKi = [np.dot(-Ki, np.dot(dK[i], Ki)) for i in xrange(nparam)]
-
-        # second kernel derivatives
-        d2K = np.zeros((nparam, nparam, y.size, y.size))
-        d2K[:-1, :-1] = self.K.hessian(x, x)
-        d2K[-1, -1] = np.eye(y.size) * 2
-
-        # likelihood
         lh = self.lh
-        # first derivative of the likelihood
         dlh = self.dlh_dtheta
+        d2lh = np.empty((len(self.params), len(self.params)))
 
-        d2lh = np.empty((nparam, nparam))
-        for i in xrange(nparam):
-            KidK_i = np.dot(Ki, dK[i])
-            ydKi_iy = np.dot(y.T, np.dot(KidK_i, Kiy))
-            ydKi_iy_tr = ydKi_iy - np.trace(KidK_i)
-
-            for j in xrange(nparam):
-                dKi_jdK_i = np.dot(dKi[j], dK[i])
-                d_ydKi_iy = (
-                    np.dot(y.T, np.dot(dKi_jdK_i, Kiy)) +
-                    np.dot(Kiy.T, np.dot(d2K[i, j], Kiy)) +
-                    np.dot(Kiy.T, np.dot(dK[i], np.dot(dKi[j], y))))
-                d_tr = np.trace(dKi_jdK_i + np.dot(Ki, d2K[i, j]))
-
-                t0 = dlh[j] * ydKi_iy_tr
-                t1 = lh * (d_ydKi_iy - d_tr)
-                d2lh[i, j] = 0.5 * (t0 + t1)
+        gp_c.d2lh_dtheta2(y, Ki, Kj, Kh, Kiy, self._s, lh, dlh, d2lh)
 
         return d2lh
 
@@ -495,10 +462,7 @@ class GP(object):
         :math:`\mathbf{x^*}` are the new locations.
 
         """
-        m, d = xo.shape
-        if d != self.d:
-            raise ValueError("wrong number of dimensions: %d" % d)
-        return self.K(xo[:, 0], xo[:, 0])
+        return self.K(xo, xo)
 
     def Kxxo(self, xo):
         r"""
@@ -522,10 +486,7 @@ class GP(object):
         :math:`\mathbf{x^*}` are the new sample locations.
 
         """
-        m, d = xo.shape
-        if d != self.d:
-            raise ValueError("wrong number of dimensions: %d" % d)
-        return self.K(self._x[:, 0], xo[:, 0])
+        return self.K(self._x, xo)
 
     def Kxox(self, xo):
         r"""
@@ -549,10 +510,7 @@ class GP(object):
         :math:`\mathbf{x}` are the given locations
 
         """
-        m, d = xo.shape
-        if d != self.d:
-            raise ValueError("wrong number of dimensions: %d" % d)
-        return self.K(xo[:, 0], self._x[:, 0])
+        return self.K(xo, self._x)
 
     def mean(self, xo):
         r"""
@@ -633,7 +591,7 @@ class GP(object):
 
         """
 
-        x, y, inv_Kxx = self._x[:, 0], self._y, self.inv_Kxx
+        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
         Kxox = self.Kxox(xo)
 
         # dimensions
@@ -648,9 +606,9 @@ class GP(object):
 
         # all kernel partial derivatives
         dKxox_dtheta = np.concatenate([
-            self.K.jacobian(xo[:, 0], x), dKxox_ds], axis=0)
+            self.K.jacobian(xo, x), dKxox_ds], axis=0)
         dKxx_dtheta = np.concatenate([
-            self.K.jacobian(x, x), dKxx_ds], axis=0)
+            self.Kxx_J, dKxx_ds], axis=0)
 
         # number of parameters
         n_p = dKxx_dtheta.shape[0]
@@ -687,8 +645,8 @@ class GP(object):
         n, d = x.shape
         if d != 1:
             raise ValueError("data has too many dimensions")
-        x = x[:, 0]
-        y = y[:, 0]
+        x = x
+        y = y
 
         if ax is None:
             ax = plt.gca()
@@ -696,7 +654,7 @@ class GP(object):
             xlim = (x.min(), x.max())
 
         X = np.linspace(xlim[0], xlim[1], 1000)
-        mean = self.mean(X)[:, 0]
+        mean = self.mean(X)
         cov = self.cov(X)
         std = np.sqrt(np.diag(cov))
         upper = mean + std
