@@ -1,4 +1,3 @@
-import traceback
 import numpy as np
 from numpy import dot
 np.seterr(all='raise')
@@ -8,17 +7,17 @@ from gp import GP
 from gp import GaussianKernel as kernel
 from util import opt, rand_params, approx_deriv
 
-EPS = np.finfo(float).eps
+DTYPE = np.float64
 
 
 def make_xy():
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)[:, None]
+    x = np.linspace(-2*np.pi, 2*np.pi, 16)[:, None].astype(DTYPE)
     y = np.sin(x)
     return x, y
 
 
 def make_xo():
-    xo = np.linspace(-2*np.pi, 2*np.pi, 32)[:, None]
+    xo = np.linspace(-2*np.pi, 2*np.pi, 32)[:, None].astype(DTYPE)
     return xo
 
 
@@ -29,8 +28,8 @@ class TestGP(object):
     def __init__(self):
         self.N_big = opt['n_big_test_iters']
         self.N_small = opt['n_small_test_iters']
-        self.thresh = np.sqrt(EPS) * 10
-        self.dtheta = np.sqrt(EPS) * 100
+        self.thresh = 1e-5
+        self.dtheta = 1e-5
 
     def check_mean(self, gp, y):
         diff = np.abs(gp.mean(gp.x) - y)
@@ -255,3 +254,121 @@ class TestGP(object):
         if pfail > 10:
             print "%.1f%% failed" % pfail
             raise AssertionError
+
+    def test_Kxx_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.Kxx.dtype == DTYPE
+
+    def test_Lxx_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.Lxx.dtype == DTYPE
+
+    def test_inv_Lxx_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.inv_Lxx.dtype == DTYPE
+
+    def test_inv_Kxx_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.inv_Kxx.dtype == DTYPE
+
+    def test_inv_Kxx_y_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.inv_Kxx_y.dtype == DTYPE
+
+    def test_log_lh_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert type(gp.log_lh) == DTYPE
+
+    def test_lh_dtype(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert type(gp.lh) == DTYPE
+
+    def test_dloglh_dtheta(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.dloglh_dtheta.dtype == DTYPE
+
+    def test_dlh_dtheta(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.dlh_dtheta.dtype == DTYPE
+
+    def test_d2lh_dtheta2(self):
+        x, y = make_xy()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.d2lh_dtheta2.dtype == DTYPE
+
+    def test_Kxoxo_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.Kxoxo(xo).dtype == DTYPE
+
+    def test_Kxxo_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.Kxxo(xo).dtype == DTYPE
+
+    def test_Kxox_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.Kxox(xo).dtype == DTYPE
+
+    def test_mean_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.mean(xo).dtype == DTYPE
+
+    def test_cov_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.cov(xo).dtype == DTYPE
+
+    def test_dm_dtheta_dtype(self):
+        x, y = make_xy()
+        xo = make_xo()
+        params = rand_params('h', 'w')
+        s = rand_params('s')
+        gp = GP(kernel(*params), x, y, s=s)
+        assert gp.dm_dtheta(xo).dtype == DTYPE
