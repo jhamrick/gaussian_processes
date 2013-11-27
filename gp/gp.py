@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import warnings
 
+from .kernels import linalg
+
 DTYPE = np.float64
 EPS = np.finfo(DTYPE).eps
 
@@ -209,7 +211,10 @@ class GP(object):
         :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.
 
         """
-        return np.linalg.cholesky(self.Kxx)
+        Kxx = self.Kxx
+        Lxx = np.empty_like(Kxx)
+        linalg.cholesky(Kxx, Lxx)
+        return Lxx
 
     @memoprop
     def inv_Lxx(self):
