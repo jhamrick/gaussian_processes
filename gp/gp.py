@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import warnings
 
+DTYPE = np.float64
+EPS = np.finfo(DTYPE).eps
+
 
 def memoprop(f):
     """
@@ -80,7 +83,7 @@ class GP(object):
     @x.setter
     def x(self, val):
         self._memoized = {}
-        self._x = val.copy()
+        self._x = val.astype(DTYPE)
         self.n, self.d = self.x.shape
         if self.d != 1:
             raise NotImplementedError("dimensions > 1 not currently supported")
@@ -102,7 +105,7 @@ class GP(object):
     @y.setter
     def y(self, val):
         self._memoized = {}
-        self._y = val.copy()
+        self._y = val.astype(DTYPE)
         if self.y.shape != (self.n, 1):
             raise ValueError("invalid shape for y: %s" % str(self.y.shape))
 
@@ -114,7 +117,7 @@ class GP(object):
 
         Returns
         -------
-        s : float
+        s : numpy.float64
 
         """
         return self._s
@@ -122,7 +125,7 @@ class GP(object):
     @s.setter
     def s(self, val):
         self._memoized = {}
-        self._s = val
+        self._s = DTYPE(val)
 
     @property
     def params(self):
@@ -184,7 +187,7 @@ class GP(object):
         """
         x, s = self._x[:, 0], self._s
         K = self.K(x, x)
-        K += np.eye(x.size) * (s ** 2)
+        K += np.eye(x.size, dtype=DTYPE) * (s ** 2)
         if np.isnan(K).any():
             print self.K.params
             raise ArithmeticError("Kxx contains invalid values")
@@ -274,7 +277,7 @@ class GP(object):
 
         Returns
         -------
-        log_lh : float
+        log_lh : numpy.float64
             Marginal log likelihood
 
         Notes
@@ -299,9 +302,9 @@ class GP(object):
         except np.linalg.LinAlgError:
             return -np.inf
 
-        data_fit = -0.5 * np.dot(y.T, Kiy)
+        data_fit = -0.5 * DTYPE(np.dot(y.T, Kiy))
         complexity_penalty = -0.5 * logdet
-        constant = -0.5 * y.size * np.log(2 * np.pi)
+        constant = -0.5 * y.size * np.log(DTYPE(2 * np.pi))
         llh = data_fit + complexity_penalty + constant
         return llh
 
@@ -312,7 +315,7 @@ class GP(object):
 
         Returns
         -------
-        lh : float
+        lh : numpy.float64
             Marginal likelihood
 
         Notes
@@ -731,9 +734,10 @@ class GP(object):
 
         randf : list of functions (optional)
             A list of functions to give an initial starting value for
-            each parameter that is being fit. The functions should take
-            no arguments, and return a float. If not specified, the
-            functions default to ``lambda: abs(numpy.random.normal())``.
+            each parameter that is being fit. The functions should
+            take no arguments, and return a numpy.float64. If not
+            specified, the functions default to ``lambda:
+            abs(numpy.random.normal())``.
 
         nrestart : int (optional)
             Number of random restarts to use. The best parameters out of
@@ -749,12 +753,9 @@ class GP(object):
         # boolean array of which parameters to fit
         fitmask = np.array(params_to_fit, dtype='bool')
 
-        EPS = np.finfo(float).eps
         # default for bounds
         if bounds is None:
-            bounds = tuple(
-                (EPS, None)
-                for p in params_to_fit if p)
+            bounds = tuple((EPS, None) for p in params_to_fit if p)
         # default for randf
         if randf is None:
             randf = tuple(

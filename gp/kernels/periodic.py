@@ -6,6 +6,8 @@ import sympy as sym
 from functools import wraps
 from . import Kernel, periodic_c
 
+DTYPE = np.float64
+
 
 class PeriodicKernel(Kernel):
     r"""
@@ -33,9 +35,9 @@ class PeriodicKernel(Kernel):
     """
 
     def __init__(self, h, w, p):
-        self.h = h #: Output scale kernel parameter
-        self.w = w #: Input scale kernel parameter
-        self.p = p #: Period kernel parameter
+        self.h = DTYPE(h) #: Output scale kernel parameter
+        self.w = DTYPE(w) #: Input scale kernel parameter
+        self.p = DTYPE(p) #: Period kernel parameter
 
     @property
     def params(self):
@@ -51,7 +53,10 @@ class PeriodicKernel(Kernel):
 
     @params.setter
     def params(self, val):
-        self.h, self.w, self.p = val
+        h, w, p = val
+        self.h = DTYPE(h)
+        self.w = DTYPE(w)
+        self.p = DTYPE(p)
 
     @property
     @wraps(Kernel.sym_K)
@@ -70,92 +75,92 @@ class PeriodicKernel(Kernel):
     @wraps(Kernel.K)
     def K(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.K(out, x1, x2, self.h, self.w, self.p)
         return out
 
     @wraps(Kernel.jacobian)
     def jacobian(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((3, x1.size, x2.size))
+            out = np.empty((3, x1.size, x2.size), dtype=DTYPE)
         periodic_c.jacobian(out, x1, x2, self.h, self.w, self.p)
         return out
 
     @wraps(Kernel.hessian)
     def hessian(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((3, 3, x1.size, x2.size))
+            out = np.empty((3, 3, x1.size, x2.size), dtype=DTYPE)
         periodic_c.hessian(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def dK_dh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def dK_dw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def dK_dp(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dp(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dhdh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dhdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dhdw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dhdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dhdp(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dhdp(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dwdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dwdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdp(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dwdp(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dpdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dpdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdp(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         periodic_c.dK_dpdp(out, x1, x2, self.h, self.w, self.p)
         return out

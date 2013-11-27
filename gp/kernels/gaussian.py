@@ -6,6 +6,8 @@ import sympy as sym
 from functools import wraps
 from . import Kernel, gaussian_c
 
+DTYPE = np.float64
+
 
 class GaussianKernel(Kernel):
     r"""
@@ -31,8 +33,8 @@ class GaussianKernel(Kernel):
     """
 
     def __init__(self, h, w):
-        self.h = h #: Output scale kernel parameter
-        self.w = w #: Input scale kernel parameter
+        self.h = DTYPE(h) #: Output scale kernel parameter
+        self.w = DTYPE(w) #: Input scale kernel parameter
 
     @property
     def params(self):
@@ -48,7 +50,9 @@ class GaussianKernel(Kernel):
 
     @params.setter
     def params(self, val):
-        self.h, self.w = val
+        h, w = val
+        self.h = DTYPE(h)
+        self.w = DTYPE(w)
 
     @property
     @wraps(Kernel.sym_K)
@@ -67,56 +71,56 @@ class GaussianKernel(Kernel):
     @wraps(Kernel.K)
     def K(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.K(out, x1, x2, self.h, self.w)
         return out
 
     @wraps(Kernel.jacobian)
     def jacobian(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((2, x1.size, x2.size))
+            out = np.empty((2, x1.size, x2.size), dtype=DTYPE)
         gaussian_c.jacobian(out, x1, x2, self.h, self.w)
         return out
 
     @wraps(Kernel.hessian)
     def hessian(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((2, 2, x1.size, x2.size))
+            out = np.empty((2, 2, x1.size, x2.size), dtype=DTYPE)
         gaussian_c.hessian(out, x1, x2, self.h, self.w)
         return out
 
     def dK_dh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dh(out, x1, x2, self.h, self.w)
         return out
 
     def dK_dw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dw(out, x1, x2, self.h, self.w)
         return out
 
     def d2K_dhdh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dhdh(out, x1, x2, self.h, self.w)
         return out
 
     def d2K_dhdw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dhdw(out, x1, x2, self.h, self.w)
         return out
 
     def d2K_dwdh(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dwdh(out, x1, x2, self.h, self.w)
         return out
 
     def d2K_dwdw(self, x1, x2, out=None):
         if out is None:
-            out = np.empty((x1.size, x2.size))
+            out = np.empty((x1.size, x2.size), dtype=DTYPE)
         gaussian_c.dK_dwdw(out, x1, x2, self.h, self.w)
         return out
