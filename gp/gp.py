@@ -591,32 +591,14 @@ class GP(object):
 
         """
 
-        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
+        y = self._y
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
+        Kjxo = self.K.jacobian(xo, self._x)
         Kxox = self.Kxox(xo)
 
-        # dimensions
-        n = x.size
-        m = xo.size
-
-        # compute kernel derivatives for s
-        dKxox_ds = np.zeros((1, m, n))
-        dKxx_ds = (np.eye(n) * 2 * self.s)[None]
-
-        # all kernel partial derivatives
-        dKxox_dtheta = np.concatenate([
-            self.K.jacobian(xo, x), dKxox_ds], axis=0)
-        dKxx_dtheta = np.concatenate([
-            self.Kxx_J, dKxx_ds], axis=0)
-
-        # number of parameters
-        n_p = dKxx_dtheta.shape[0]
-
-        dm = np.empty((n_p, m))
-        for i in xrange(n_p):
-            inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
-            term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))
-            term2 = np.dot(Kxox, np.dot(inv_dKxx_dtheta, y))
-            dm[i] = term1 - term2
+        dm = np.empty((len(self.params), xo.size))
+        gp_c.dm_dtheta(y, Ki, Kj, Kjxo, Kxox, self._s, dm)
 
         return dm
 

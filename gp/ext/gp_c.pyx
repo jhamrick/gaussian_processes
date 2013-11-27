@@ -114,3 +114,23 @@ def d2lh_dtheta2(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, 
             t1c = dot(Kiy, dot(dK[i], dot(dKi[j], y)))
             t1 = lh * (t1a + t1b + t1c - trace(dKi_jdK_i + dot(Ki, d2k)))
             d2lh[i, j] = 0.5 * (t0 + t1)
+
+
+def dm_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np.ndarray[DTYPE_t, ndim=3] Kj, np.ndarray[DTYPE_t, ndim=3] Kjxo, np.ndarray[DTYPE_t, ndim=2] Kxox, DTYPE_t s, np.ndarray[DTYPE_t, ndim=2] dm):
+    cdef int n = Kj.shape[0]
+    cdef int m = Kj.shape[1]
+    cdef int m2 = Kjxo.shape[1]
+    cdef int i
+    cdef np.ndarray[DTYPE_t, ndim=2] dKxox_dtheta = np.empty((m2, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=2] dKxx_dtheta = np.empty((m, m), dtype=DTYPE)
+
+    for i in xrange(n+1):
+        if i < n:
+            dKxox_dtheta[:] = Kjxo[i]
+            dKxx_dtheta[:] = Kj[i]
+        else:
+            dKxox_dtheta.fill(0)
+            dKxx_dtheta[:] = eye(m) * 2 * s
+
+        dm[i] = dot(dKxox_dtheta, dot(Ki, y))
+        dm[i] -= dot(Kxox, dot(dot(Ki, dot(dKxx_dtheta, Ki)), y))
