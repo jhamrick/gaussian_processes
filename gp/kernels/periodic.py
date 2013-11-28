@@ -115,53 +115,53 @@ class PeriodicKernel(Kernel):
     def d2K_dhdh(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dhdh(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dhdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dhdw(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dhdw(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dhdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dhdp(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dhdp(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dhdp(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdh(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dwdh(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dwdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdw(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dwdw(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dwdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dwdp(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dwdp(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dwdp(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdh(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dpdh(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dpdh(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdw(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dpdw(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dpdw(out, x1, x2, self.h, self.w, self.p)
         return out
 
     def d2K_dpdp(self, x1, x2, out=None):
         if out is None:
             out = np.empty((x1.size, x2.size), dtype=DTYPE)
-        periodic_c.dK_dpdp(out, x1, x2, self.h, self.w, self.p)
+        periodic_c.d2K_dpdp(out, x1, x2, self.h, self.w, self.p)
         return out
