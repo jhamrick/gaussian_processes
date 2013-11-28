@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.1
+
+* Fix bugs in compiling documentation
+
 ## Version 1.0.0
 
 * Use Cython instead of Numba
