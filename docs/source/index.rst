@@ -11,8 +11,8 @@ Documentation
 .. toctree::
    :maxdepth: 4
 
-   gp
-   kernels
+   gp.gp
+   gp.kernels
 
 Much of this code is based off of [RW06]_.
 
