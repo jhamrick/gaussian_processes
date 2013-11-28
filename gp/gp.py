@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import warnings
 
+from .ext import gp_c
+
+DTYPE = np.float64
+EPS = np.finfo(DTYPE).eps
+MIN = np.log(np.exp2(DTYPE(np.finfo(DTYPE).minexp + 4)))
+
 
 def memoprop(f):
     """
@@ -40,9 +46,9 @@ class GP(object):
     K : :class:`kernels.Kernel`
         Kernel object
     x : numpy.ndarray
-        :math:`n\times d` array of input locations
+        :math:`n` array of input locations
     y : numpy.ndarray
-        :math:`n\times 1` array of input observations
+        :math:`n` array of input observations
     s : number (default=0)
         Standard deviation of observation noise
 
@@ -54,10 +60,15 @@ class GP(object):
 
         """
         self._memoized = {}
+        self._x = None
+        self._y = None
+        self._s = None
+        self.n = 0
 
         #: Kernel for the gaussian process, of type
         #: :class:`kernels.Kernel`
         self.K = K
+        self._params = np.empty(K.params.size + 1, dtype=DTYPE)
 
         self.x = x
         self.y = y
@@ -71,17 +82,18 @@ class GP(object):
         Returns
         -------
         x : numpy.ndarray
-            :math:`n\times d` array, where :math:`n` is the number of
-            locations and :math:`d` is the number of dimensions.
+            :math:`n` array, where :math:`n` is the number of
+            locations.
 
         """
         return self._x
 
     @x.setter
     def x(self, val):
-        assert val.ndim == 2, val.ndim
-        self._memoized = {}
-        self._x = val.copy()
+        if np.any(val != self._x):
+            self._memoized = {}
+            self._x = val.astype(DTYPE)
+            self.n, = self.x.shape
 
     @property
     def y(self):
@@ -91,7 +103,7 @@ class GP(object):
         Returns
         -------
         y : numpy.ndarray
-            :math:`n\times 1` array, where :math:`n` is the number of
+            :math:`n` array, where :math:`n` is the number of
             observations.
 
         """
@@ -99,9 +111,11 @@ class GP(object):
 
     @y.setter
     def y(self, val):
-        assert val.ndim == 2, val.ndim
-        self._memoized = {}
-        self._y = val.copy()
+        if np.any(val != self._y):
+            self._memoized = {}
+            self._y = val.astype(DTYPE)
+            if self.y.shape != (self.n,):
+                raise ValueError("invalid shape for y: %s" % str(self.y.shape))
 
     @property
     def s(self):
@@ -111,15 +125,16 @@ class GP(object):
 
         Returns
         -------
-        s : float
+        s : numpy.float64
 
         """
         return self._s
 
     @s.setter
     def s(self, val):
-        self._memoized = {}
-        self._s = val
+        if val != self._s:
+            self._memoized = {}
+            self._s = DTYPE(val)
 
     @property
     def params(self):
@@ -128,20 +143,20 @@ class GP(object):
 
         Returns
         -------
-        params : tuple
+        params : numpy.ndarray
            Consists of the kernel's parameters, `self.K.params`, and the
            observation noise parameter, :math:`s`, in that order.
 
         """
-        return tuple(list(self.K.params) + [self._s])
+        self._params[:-1] = self.K.params
+        self._params[-1] = self._s
+        return self._params
 
     @params.setter
     def params(self, val):
-        params = self.params
-        if params[:-1] != val[:-1]:
+        if np.any(self.params != val):
             self._memoized = {}
             self.K.params = val[:-1]
-        if params[-1] != val[-1]:
             self.s = val[-1]
 
     def copy(self):
@@ -181,11 +196,18 @@ class GP(object):
         """
         x, s = self._x, self._s
         K = self.K(x, x)
-        K += np.eye(x.size) * (s ** 2)
-        if np.isnan(K).any():
-            print self.K.params
-            raise ArithmeticError("Kxx contains invalid values")
+        K += np.eye(x.size, dtype=DTYPE) * (s ** 2)
         return K
+
+    @memoprop
+    def Kxx_J(self):
+        x = self._x
+        return self.K.jacobian(x, x)
+
+    @memoprop
+    def Kxx_H(self):
+        x = self._x
+        return self.K.hessian(x, x)
 
     @memoprop
     def Lxx(self):
@@ -235,16 +257,8 @@ class GP(object):
             :math:`n\times n` matrix
 
         """
-        try:
-            Li = self.inv_Lxx
-            Ki = np.dot(Li.T, Li)
-        except np.linalg.LinAlgError:
-            warnings.warn(
-                "gp.GP.inv_Kxx: Warning! Matrix is not invertible, "
-                "computing pseudo-inverse",
-                RuntimeWarning)
-            Ki = np.linalg.pinv(self.Kxx)
-        return Ki
+        Li = self.inv_Lxx
+        return np.dot(Li.T, Li)
 
     @memoprop
     def inv_Kxx_y(self):
@@ -255,7 +269,7 @@ class GP(object):
         Returns
         -------
         inv_Kxx_y : numpy.ndarray
-            :math:`n\times 1` array
+            :math:`n` array
 
         Notes
         -----
@@ -271,7 +285,7 @@ class GP(object):
 
         Returns
         -------
-        log_lh : float
+        log_lh : numpy.float64
             Marginal log likelihood
 
         Notes
@@ -287,20 +301,10 @@ class GP(object):
         where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
         """
-        y, K = self._y, self.Kxx
-        sign, logdet = np.linalg.slogdet(K)
-        if sign != 1:
-            return -np.inf
-        try:
-            Kiy = self.inv_Kxx_y
-        except np.linalg.LinAlgError:
-            return -np.inf
-
-        data_fit = -0.5 * np.dot(y.T, Kiy)
-        complexity_penalty = -0.5 * logdet
-        constant = -0.5 * y.size * np.log(2 * np.pi)
-        llh = data_fit + complexity_penalty + constant
-        return llh
+        y = self._y
+        K = self.Kxx
+        Kiy = self.inv_Kxx_y
+        return DTYPE(gp_c.log_lh(y, K, Kiy))
 
     @memoprop
     def lh(self):
@@ -309,7 +313,7 @@ class GP(object):
 
         Returns
         -------
-        lh : float
+        lh : numpy.float64
             Marginal likelihood
 
         Notes
@@ -325,7 +329,11 @@ class GP(object):
         where :math:`d` is the dimensionality of :math:`\mathbf{x}`.
 
         """
-        return np.exp(self.log_lh)
+        llh = self.log_lh
+        if llh < MIN:
+            return 0
+        else:
+            return np.exp(self.log_lh)
 
     @memoprop
     def dloglh_dtheta(self):
@@ -351,26 +359,12 @@ class GP(object):
 
         """
 
-        x, y = self._x, self._y
-        try:
-            Ki = self.inv_Kxx
-        except np.linalg.LinAlgError:
-            return np.array([-np.inf for p in self.params])
-
-        nparam = len(self.params)
-
-        # compute kernel jacobian
-        dK_dtheta = np.empty((nparam, y.size, y.size))
-        dK_dtheta[:-1] = self.K.jacobian(x, x)
-        dK_dtheta[-1] = np.eye(y.size) * 2 * self._s
-
-        dloglh = np.empty(nparam)
-        for i in xrange(dloglh.size):
-            k = np.dot(Ki, dK_dtheta[i])
-            t0 = 0.5 * np.dot(y.T, np.dot(k, self.inv_Kxx_y))
-            t1 = -0.5 * np.trace(k)
-            dloglh[i] = t0 + t1
-
+        y = self._y
+        dloglh = np.empty(len(self.params))
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
+        Kiy = self.inv_Kxx_y
+        gp_c.dloglh_dtheta(y, Ki, Kj, Kiy, self._s, dloglh)
         return dloglh
 
     @memoprop
@@ -392,22 +386,13 @@ class GP(object):
 
         """
 
-        x, y, K, Ki = self._x, self._y, self.Kxx, self.inv_Kxx
+        y = self._y
+        dlh = np.empty(len(self.params))
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
-        nparam = len(self.params)
-
-        dK_dtheta = np.empty((nparam, y.size, y.size))
-        dK_dtheta[:-1] = self.K.jacobian(x, x)
-        dK_dtheta[-1] = np.eye(y.size) * 2 * self._s
-
         lh = self.lh
-        dlh = np.empty(nparam)
-        for i in xrange(dlh.size):
-            KidK = np.dot(Ki, dK_dtheta[i])
-            t0 = np.dot(y.T, np.dot(KidK, Kiy))
-            t1 = np.trace(KidK)
-            dlh[i] = 0.5 * lh * (t0 - t1)
-
+        gp_c.dlh_dtheta(y, Ki, Kj, Kiy, self._s, lh, dlh)
         return dlh
 
     @memoprop
@@ -429,44 +414,15 @@ class GP(object):
 
         """
 
-        y, x, K, Ki = self._y, self._x, self.Kxx, self.inv_Kxx
+        y = self._y
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
+        Kh = self.Kxx_H
         Kiy = self.inv_Kxx_y
-        nparam = len(self.params)
-
-        # first kernel derivatives
-        dK = np.empty((nparam, y.size, y.size))
-        dK[:-1] = self.K.jacobian(x, x)
-        dK[-1] = np.eye(y.size) * 2 * self._s
-        dKi = [np.dot(-Ki, np.dot(dK[i], Ki)) for i in xrange(nparam)]
-
-        # second kernel derivatives
-        d2K = np.zeros((nparam, nparam, y.size, y.size))
-        d2K[:-1, :-1] = self.K.hessian(x, x)
-        d2K[-1, -1] = np.eye(y.size) * 2
-
-        # likelihood
         lh = self.lh
-        # first derivative of the likelihood
         dlh = self.dlh_dtheta
-
-        d2lh = np.empty((nparam, nparam))
-        for i in xrange(nparam):
-            KidK_i = np.dot(Ki, dK[i])
-            ydKi_iy = np.dot(y.T, np.dot(KidK_i, Kiy))
-            ydKi_iy_tr = ydKi_iy - np.trace(KidK_i)
-
-            for j in xrange(nparam):
-                dKi_jdK_i = np.dot(dKi[j], dK[i])
-                d_ydKi_iy = (
-                    np.dot(y.T, np.dot(dKi_jdK_i, Kiy)) +
-                    np.dot(Kiy.T, np.dot(d2K[i, j], Kiy)) +
-                    np.dot(Kiy.T, np.dot(dK[i], np.dot(dKi[j], y))))
-                d_tr = np.trace(dKi_jdK_i + np.dot(Ki, d2K[i, j]))
-
-                t0 = dlh[j] * ydKi_iy_tr
-                t1 = lh * (d_ydKi_iy - d_tr)
-                d2lh[i, j] = 0.5 * (t0 + t1)
-
+        d2lh = np.empty((len(self.params), len(self.params)))
+        gp_c.d2lh_dtheta2(y, Ki, Kj, Kh, Kiy, self._s, lh, dlh, d2lh)
         return d2lh
 
     def Kxoxo(self, xo):
@@ -476,7 +432,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -499,7 +455,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -523,7 +479,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -546,12 +502,12 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
         mean : numpy.ndarray
-            :math:`m\times d` array of predictive means
+            :math:`m` array of predictive means
 
         Notes
         -----
@@ -571,7 +527,7 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
@@ -600,12 +556,12 @@ class GP(object):
         Parameters
         ----------
         xo : numpy.ndarray
-            :math:`m\times d` array of new sample locations
+            :math:`m` array of new sample locations
 
         Returns
         -------
         dm_dtheta : numpy.ndarray
-            :math:`n_p\times m\times d` array, where :math:`n_p` is the
+            :math:`n_p\times m` array, where :math:`n_p` is the
             number of parameters (see `params`).
 
         Notes
@@ -618,32 +574,14 @@ class GP(object):
 
         """
 
-        x, y, inv_Kxx = self._x, self._y, self.inv_Kxx
+        y = self._y
+        Ki = self.inv_Kxx
+        Kj = self.Kxx_J
+        Kjxo = self.K.jacobian(xo, self._x)
         Kxox = self.Kxox(xo)
 
-        # dimensions
-        n, d = x.shape
-        m, d = xo.shape
-
-        # compute kernel derivatives for s
-        dKxox_ds = np.zeros((1, m, n))
-        dKxx_ds = (np.eye(n) * 2 * self.s)[None]
-
-        # all kernel partial derivatives
-        dKxox_dtheta = np.concatenate([
-            self.K.jacobian(xo, x), dKxox_ds], axis=0)
-        dKxx_dtheta = np.concatenate([
-            self.K.jacobian(x, x), dKxx_ds], axis=0)
-
-        # number of parameters
-        n_p = dKxx_dtheta.shape[0]
-
-        dm = np.empty((n_p, m, 1))
-        for i in xrange(n_p):
-            inv_dKxx_dtheta = np.dot(inv_Kxx, np.dot(dKxx_dtheta[i], inv_Kxx))
-            term1 = np.dot(dKxox_dtheta[i], np.dot(inv_Kxx, y))
-            term2 = np.dot(Kxox, np.dot(inv_dKxx_dtheta, y))
-            dm[i] = term1 - term2
+        dm = np.empty((len(self.params), xo.size))
+        gp_c.dm_dtheta(y, Ki, Kj, Kjxo, Kxox, self._s, dm)
 
         return dm
 
@@ -667,11 +605,6 @@ class GP(object):
         """
 
         x, y = self._x, self._y
-        n, d = x.shape
-        if d != 1:
-            raise ValueError("data has too many dimensions")
-        x = x[:, 0]
-        y = y[:, 0]
 
         if ax is None:
             ax = plt.gca()
@@ -679,7 +612,7 @@ class GP(object):
             xlim = (x.min(), x.max())
 
         X = np.linspace(xlim[0], xlim[1], 1000)
-        mean = self.mean(X)[:, 0]
+        mean = self.mean(X)
         cov = self.cov(X)
         std = np.sqrt(np.diag(cov))
         upper = mean + std
@@ -717,9 +650,10 @@ class GP(object):
 
         randf : list of functions (optional)
             A list of functions to give an initial starting value for
-            each parameter that is being fit. The functions should take
-            no arguments, and return a float. If not specified, the
-            functions default to ``lambda: abs(numpy.random.normal())``.
+            each parameter that is being fit. The functions should
+            take no arguments, and return a numpy.float64. If not
+            specified, the functions default to ``lambda:
+            abs(numpy.random.normal())``.
 
         nrestart : int (optional)
             Number of random restarts to use. The best parameters out of
@@ -735,12 +669,9 @@ class GP(object):
         # boolean array of which parameters to fit
         fitmask = np.array(params_to_fit, dtype='bool')
 
-        EPS = np.finfo(float).eps
         # default for bounds
         if bounds is None:
-            bounds = tuple(
-                (EPS, None)
-                for p in params_to_fit if p)
+            bounds = tuple((EPS, None) for p in params_to_fit if p)
         # default for randf
         if randf is None:
             randf = tuple(

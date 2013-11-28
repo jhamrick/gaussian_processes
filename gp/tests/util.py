@@ -2,8 +2,13 @@ import numpy as np
 
 
 opt = {
-    'n_big_test_iters': 20,
-    'n_small_test_iters': 5
+    'n_big_test_iters': 100,
+    'n_small_test_iters': 10,
+    'pct_allowed_failures': 5,
+    'error_threshold': 1e-5,
+    'dtheta': 1e-5,
+    'dtype': np.float64,
+    'eps': np.finfo(np.float64).eps,
 }
 
 
@@ -26,3 +31,22 @@ def rand_params(*args):
 def approx_deriv(y0, y1, dx):
     dy = (y1 - y0) / 2.
     return dy / dx
+
+
+def make_xy():
+    x = np.linspace(-2*np.pi, 2*np.pi, 16).astype(opt['dtype'])
+    y = np.sin(x)
+    return x, y
+
+
+def make_xo():
+    xo = np.linspace(-2*np.pi, 2*np.pi, 32).astype(opt['dtype'])
+    return xo
+
+
+def seed():
+    np.random.seed(2348)
+
+
+def allclose(x, y):
+    return np.allclose(x, y, rtol=opt['error_threshold'])
