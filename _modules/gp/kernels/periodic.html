@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp.kernels.periodic &mdash; gaussian_processes 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 1.0.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for gp.kernels.periodic</h1><div class="highlight"><pre>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;PeriodicKernel&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="kn">as</span> <span class="nn">sym</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">gp.ext</span> <span class="kn">import</span> <span class="n">periodic_c</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Kernel</span>
+
+<span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+
+<div class="viewcode-block" id="PeriodicKernel"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel">[docs]</a><span class="k">class</span> <span class="nc">PeriodicKernel</span><span class="p">(</span><span class="n">Kernel</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Periodic kernel function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Output scale kernel parameter</span>
+<span class="sd">    w : float</span>
+<span class="sd">        Input scale kernel parameter</span>
+<span class="sd">    p : float</span>
+<span class="sd">        Period kernel parameter</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The periodic kernel is defined by Equation 4.31 of [RW06]_:</span>
+
+<span class="sd">    .. math:: K(x_1, x_2) = h^2\exp\left(\frac{-2\sin^2\left(\frac{x_1-x_2}{2p}\right)}{w^2}\right)</span>
+
+<span class="sd">    where :math:`w` is the input scale parameter (equivalent to the</span>
+<span class="sd">    standard deviation of the Gaussian), :math:`h` is the output</span>
+<span class="sd">    scale parameter, and :math:`p` is the period kernel parameter.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="c">#: Output scale kernel parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="c">#: Input scale kernel parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="c">#: Period kernel parameter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : numpy.ndarray ``(h, w, p)``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+
+    <span class="nd">@params.setter</span>
+<div class="viewcode-block" id="PeriodicKernel.params"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.params">[docs]</a>    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">sym_K</span><span class="p">)</span>
+<div class="viewcode-block" id="PeriodicKernel.sym_K"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.sym_K">[docs]</a>    <span class="k">def</span> <span class="nf">sym_K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">w2</span> <span class="o">=</span> <span class="n">w</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">h2</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span><span class="o">*</span><span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">p</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">w2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+<div class="viewcode-block" id="PeriodicKernel.K"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">jacobian</span><span class="p">)</span>
+<div class="viewcode-block" id="PeriodicKernel.jacobian"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">hessian</span><span class="p">)</span>
+<div class="viewcode-block" id="PeriodicKernel.hessian"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.hessian">[docs]</a>    <span class="k">def</span> <span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.dK_dh"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.dK_dh">[docs]</a>    <span class="k">def</span> <span class="nf">dK_dh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">dK_dh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.dK_dw"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.dK_dw">[docs]</a>    <span class="k">def</span> <span class="nf">dK_dw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">dK_dw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.dK_dp"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.dK_dp">[docs]</a>    <span class="k">def</span> <span class="nf">dK_dp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">dK_dp</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dhdh"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dhdh">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dhdh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dhdh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dhdw"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dhdw">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dhdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dhdw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dhdp"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dhdp">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dhdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dhdp</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dwdh"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dwdh">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dwdh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dwdh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dwdw"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dwdw">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dwdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dwdw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dwdp"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dwdp">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dwdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dwdp</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dpdh"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dpdh">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dpdh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dpdh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dpdw"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dpdw">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dpdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dpdw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="PeriodicKernel.d2K_dpdp"><a class="viewcode-back" href="../../../gp.kernels.PeriodicKernel.html#gp.kernels.periodic.PeriodicKernel.d2K_dpdp">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dpdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">periodic_c</span><span class="o">.</span><span class="n">d2K_dpdp</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jessica B. Hamrick.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

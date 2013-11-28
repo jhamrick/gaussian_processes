@@ -1,0 +1,744 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Gaussian process object &mdash; gaussian_processes 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 1.0.0 documentation" href="index.html" />
+    <link rel="next" title="Kernels" href="gp.kernels.html" />
+    <link rel="prev" title="Gaussian Processes" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.kernels.html" title="Kernels"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Gaussian Processes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="gaussian-process-object">
+<h1>Gaussian process object<a class="headerlink" href="#gaussian-process-object" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gp.gp.GP">
+<em class="property">class </em><tt class="descclassname">gp.gp.</tt><tt class="descname">GP</tt><big>(</big><em>K</em>, <em>x</em>, <em>y</em>, <em>s=0</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Gaussian Process object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>K</strong> : <a class="reference internal" href="gp.kernels.Kernel.html#gp.kernels.base.Kernel" title="gp.kernels.base.Kernel"><tt class="xref py py-class docutils literal"><span class="pre">Kernel</span></tt></a></p>
+<blockquote>
+<div><p>Kernel object</p>
+</div></blockquote>
+<p><strong>x</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(n\)</span> array of input locations</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(n\)</span> array of input observations</p>
+</div></blockquote>
+<p><strong>s</strong> : number (default=0)</p>
+<blockquote class="last">
+<div><p>Standard deviation of observation noise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="gp.gp.GP.K">
+<tt class="descname">K</tt><em class="property"> = None</em><a class="headerlink" href="#gp.gp.GP.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel for the gaussian process, of type
+<a class="reference internal" href="gp.kernels.Kernel.html#gp.kernels.base.Kernel" title="gp.kernels.base.Kernel"><tt class="xref py py-class docutils literal"><span class="pre">Kernel</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.Kxox">
+<tt class="descname">Kxox</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.Kxox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix between new sample locations and given
+locations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>Kxox</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(m\times n\)</span> covariance matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined as <span class="math">\(K(\mathbf{x^*},\mathbf{x})\)</span>, where
+<span class="math">\(\mathbf{x^*}\)</span> are the new sample locations and
+<span class="math">\(\mathbf{x}\)</span> are the given locations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.Kxoxo">
+<tt class="descname">Kxoxo</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.Kxoxo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxoxo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix of new sample locations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>Kxoxo</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(m\times m\)</span> covariance matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined as <span class="math">\(K(\mathbf{x^*}, \mathbf{x^*})\)</span>, where
+<span class="math">\(\mathbf{x^*}\)</span> are the new locations.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.Kxx">
+<tt class="descname">Kxx</tt><a class="reference internal" href="_modules/gp/gp.html#GP.Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix <span class="math">\(\mathbf{K}_{xx}\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>Kxx</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\times n\)</span> covariance matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The entry at index <span class="math">\((i, j)\)</span> is defined as:</p>
+<div class="math">
+\[K_{x_ix_j} = K(x_i, x_j) + s^2\delta(x_i-x_j),\]</div>
+<p>where <span class="math">\(K(\cdot{})\)</span> is the kernel function, <span class="math">\(s\)</span> is the
+standard deviation of the observation noise, and <span class="math">\(\delta\)</span>
+is the Dirac delta function.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.Kxx_H">
+<tt class="descname">Kxx_H</tt><a class="reference internal" href="_modules/gp/gp.html#GP.Kxx_H"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxx_H" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.Kxx_J">
+<tt class="descname">Kxx_J</tt><a class="reference internal" href="_modules/gp/gp.html#GP.Kxx_J"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxx_J" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.Kxxo">
+<tt class="descname">Kxxo</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.Kxxo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Kxxo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kernel covariance matrix between given locations and new sample
+locations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>Kxxo</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\times m\)</span> covariance matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined as <span class="math">\(K(\mathbf{x},\mathbf{x^*})\)</span>, where
+<span class="math">\(\mathbf{x}\)</span> are the given locations and
+<span class="math">\(\mathbf{x^*}\)</span> are the new sample locations.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.Lxx">
+<tt class="descname">Lxx</tt><a class="reference internal" href="_modules/gp/gp.html#GP.Lxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.Lxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cholesky decomposition of the kernel covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>Lxx</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\times n\)</span> lower triangular matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The value is <span class="math">\(\mathbf{L}_{xx}\)</span>, such that
+<span class="math">\(\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top\)</span>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a copy of the gaussian process object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>gp</strong> : <a class="reference internal" href="#gp.gp.GP" title="gp.gp.GP"><tt class="xref py py-class docutils literal"><span class="pre">GP</span></tt></a></p>
+<blockquote class="last">
+<div><p>New gaussian process object</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.cov">
+<tt class="descname">cov</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.cov"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictive covariance of the gaussian process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>cov</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(m\times m\)</span> array of predictive covariances</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined by Eq. 2.24 of <a class="reference internal" href="index.html#rw06">[RW06]</a>:</p>
+<div class="math">
+\[\mathbf{C}=K(\mathbf{x^*}, \mathbf{x^*}) - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}K(\mathbf{x}, \mathbf{x^*})\]</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.d2lh_dtheta2">
+<tt class="descname">d2lh_dtheta2</tt><a class="reference internal" href="_modules/gp/gp.html#GP.d2lh_dtheta2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.d2lh_dtheta2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second derivative of the marginal likelihood.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>d2lh_dtheta2</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n_\theta\)</span>-length vector of derivatives, where
+<span class="math">\(n_\theta\)</span> is the number of parameters (equivalent to
+<tt class="docutils literal"><span class="pre">len(self.params)</span></tt>).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is a matrix of second partial derivatives of the likelihood
+with respect to its parameters <span class="math">\(\theta\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.dlh_dtheta">
+<tt class="descname">dlh_dtheta</tt><a class="reference internal" href="_modules/gp/gp.html#GP.dlh_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.dlh_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the marginal likelihood.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>dlh_dtheta</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n_\theta\)</span>-length vector of derivatives, where
+<span class="math">\(n_\theta\)</span> is the number of parameters (equivalent to
+<tt class="docutils literal"><span class="pre">len(self.params)</span></tt>).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is a vector of first partial derivatives of the likelihood
+with respect to its parameters <span class="math">\(\theta\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.dloglh_dtheta">
+<tt class="descname">dloglh_dtheta</tt><a class="reference internal" href="_modules/gp/gp.html#GP.dloglh_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.dloglh_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the marginal log likelihood.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>dloglh_dtheta</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n_\theta\)</span>-length vector of derivatives, where
+<span class="math">\(n_\theta\)</span> is the number of parameters (equivalent to
+<tt class="docutils literal"><span class="pre">len(self.params)</span></tt>).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is a vector of first partial derivatives of the log
+likelihood with respect to its parameters <span class="math">\(\theta\)</span>. It is
+defined by Equation 5.9 of <a class="reference internal" href="index.html#rw06">[RW06]</a>:</p>
+<div class="math">
+\[\frac{\partial}{\partial\theta_i}\log{p(\mathbf{y}|\mathbf{x},\theta)}=\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}-\frac{1}{2}\mathbf{tr}\left(\mathbf{K}_{xx}^{-1}\frac{\partial\mathbf{K}_{xx}}{\partial\theta_i}\right)\]</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.dm_dtheta">
+<tt class="descname">dm_dtheta</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.dm_dtheta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.dm_dtheta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the mean of the gaussian process with respect to
+its parameters, and evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">xo</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>dm_dtheta</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n_p\times m\)</span> array, where <span class="math">\(n_p\)</span> is the
+number of parameters (see <tt class="xref py py-obj docutils literal"><span class="pre">params</span></tt>).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The analytic form is:</p>
+<div class="math">
+\[\frac{\partial}{\partial \theta_i}m(\mathbf{x^*})=\frac{\partial K(\mathbf{x^*}, \mathbf{x})}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y} - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\frac{\partial \mathbf{K}_{xx}}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}\]</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.fit_MLII">
+<tt class="descname">fit_MLII</tt><big>(</big><em>params_to_fit</em>, <em>bounds=None</em>, <em>randf=None</em>, <em>nrestart=5</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.fit_MLII"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.fit_MLII" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit parameters of the gaussian process using MLII (maximum
+likelihood) estimation.</p>
+<p>Note that this method modifies the gaussian process in
+place. After the method is run, the <tt class="xref py py-obj docutils literal"><span class="pre">GP</span></tt> object will have new
+parameters set to the best ones found during the optimization.</p>
+<p>The optimization algorithm used is L-BFGS-B.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>params_to_fit</strong> : boolean array_like</p>
+<blockquote>
+<div><p>A list of booleans corresponding to the gaussian process
+parameters, indicating which parameters should be
+fit. Parameters which are not fit keep their current value.</p>
+</div></blockquote>
+<p><strong>bounds</strong> : list of tuples (optional)</p>
+<blockquote>
+<div><p>The upper and lower bounds for each parameter that is being
+fit; use <tt class="docutils literal"><span class="pre">None</span></tt> to specify no bound. If not specified,
+the bounds default to <tt class="docutils literal"><span class="pre">(EPS,</span> <span class="pre">None)</span></tt>, where
+<tt class="docutils literal"><span class="pre">EPS=numpy.finfo(float).eps</span></tt>.</p>
+</div></blockquote>
+<p><strong>randf</strong> : list of functions (optional)</p>
+<blockquote>
+<div><p>A list of functions to give an initial starting value for
+each parameter that is being fit. The functions should
+take no arguments, and return a numpy.float64. If not
+specified, the functions default to <tt class="docutils literal"><span class="pre">lambda:</span>
+<span class="pre">abs(numpy.random.normal())</span></tt>.</p>
+</div></blockquote>
+<p><strong>nrestart</strong> : int (optional)</p>
+<blockquote>
+<div><p>Number of random restarts to use. The best parameters out of
+all the random restarts are used.</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool (optional)</p>
+<blockquote class="last">
+<div><p>Whether to print information about the optimization.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.inv_Kxx">
+<tt class="descname">inv_Kxx</tt><a class="reference internal" href="_modules/gp/gp.html#GP.inv_Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.inv_Kxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse kernel covariance matrix, <span class="math">\(\mathbf{K}_{xx}^{-1}\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>inv_Kxx</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\times n\)</span> matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.inv_Kxx_y">
+<tt class="descname">inv_Kxx_y</tt><a class="reference internal" href="_modules/gp/gp.html#GP.inv_Kxx_y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.inv_Kxx_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dot product of the inverse kernel covariance matrix and of
+observation vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>inv_Kxx_y</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\)</span> array</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined as <span class="math">\(\mathbf{K}_{xx}^{-1}\mathbf{y}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.inv_Lxx">
+<tt class="descname">inv_Lxx</tt><a class="reference internal" href="_modules/gp/gp.html#GP.inv_Lxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.inv_Lxx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse cholesky decomposition of the kernel covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>inv_Lxx</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\times n\)</span> matrix</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The value is <span class="math">\(\mathbf{L}_{xx}^{-1}\)</span>, such that:</p>
+<div class="math">
+\[\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top\]</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.lh">
+<tt class="descname">lh</tt><a class="reference internal" href="_modules/gp/gp.html#GP.lh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.lh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal likelihood.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>lh</strong> : numpy.float64</p>
+<blockquote class="last">
+<div><p>Marginal likelihood</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is the likelihood of observations <span class="math">\(\mathbf{y}\)</span> given
+locations <span class="math">\(\mathbf{x}\)</span> and kernel parameters
+<span class="math">\(\theta\)</span>. It is defined as:</p>
+<div class="math">
+\[p(\mathbf{y} | \mathbf{x}, \mathbf{\theta}) = \left(2\pi\right)^{-\frac{d}{2}}\left|\mathbf{K}_{xx}\right|^{-\frac{1}{2}}\exp\left(-\frac{1}{2}\mathbf{y}^\top\mathbf{K}_{xx}^{-1}\mathbf{y}\right)\]</div>
+<p>where <span class="math">\(d\)</span> is the dimensionality of <span class="math">\(\mathbf{x}\)</span>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.log_lh">
+<tt class="descname">log_lh</tt><a class="reference internal" href="_modules/gp/gp.html#GP.log_lh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.log_lh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marginal log likelihood.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>log_lh</strong> : numpy.float64</p>
+<blockquote class="last">
+<div><p>Marginal log likelihood</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is the log likelihood of observations <span class="math">\(\mathbf{y}\)</span>
+given locations <span class="math">\(\mathbf{x}\)</span> and kernel parameters
+<span class="math">\(\theta\)</span>. It is defined by Eq. 5.8 of <a class="reference internal" href="index.html#rw06">[RW06]</a>:</p>
+<div class="math">
+\[\log{p(\mathbf{y} | \mathbf{x}, \mathbf{\theta})} = -\frac{1}{2}\mathbf{y}^\top \mathbf{K}_{xx}^{-1}\mathbf{y} - \frac{1}{2}\log{\left|\mathbf{K}_{xx}\right|}-\frac{d}{2}\log{2\pi},\]</div>
+<p>where <span class="math">\(d\)</span> is the dimensionality of <span class="math">\(\mathbf{x}\)</span>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.mean">
+<tt class="descname">mean</tt><big>(</big><em>xo</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predictive mean of the gaussian process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>xo</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p><span class="math">\(m\)</span> array of new sample locations</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>mean</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(m\)</span> array of predictive means</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is defined by Equation 2.23 of <a class="reference internal" href="index.html#rw06">[RW06]</a>:</p>
+<div class="math">
+\[\mathbf{m}(\mathbf{x^*})=K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\mathbf{y}\]</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.params">
+<tt class="descname">params</tt><a class="reference internal" href="_modules/gp/gp.html#GP.params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian process parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>params</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Consists of the kernel&#8217;s parameters, <tt class="xref py py-obj docutils literal"><span class="pre">self.K.params</span></tt>, and the
+observation noise parameter, <span class="math">\(s\)</span>, in that order.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gp.gp.GP.plot">
+<tt class="descname">plot</tt><big>(</big><em>ax=None</em>, <em>xlim=None</em>, <em>color='k'</em>, <em>markercolor='r'</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the predictive mean and variance of the gaussian process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>ax</strong> : <tt class="xref py py-obj docutils literal"><span class="pre">matplotlib.pyplot.axes.Axes</span></tt> (optional)</p>
+<blockquote>
+<div><p>The axes on which to draw the graph. Defaults to
+<tt class="docutils literal"><span class="pre">plt.gca()</span></tt> if not given.</p>
+</div></blockquote>
+<p><strong>xlim</strong> : (lower x limit, upper x limit) (optional)</p>
+<blockquote>
+<div><p>The limits of the x-axis. Defaults to the minimum and
+maximum of <tt class="xref py py-obj docutils literal"><span class="pre">x</span></tt> if not given.</p>
+</div></blockquote>
+<p><strong>color</strong> : str (optional)</p>
+<blockquote>
+<div><p>The line color to use. The default is &#8216;k&#8217; (black).</p>
+</div></blockquote>
+<p><strong>markercolor</strong> : str (optional)</p>
+<blockquote class="last">
+<div><p>The marker color to use. The default is &#8216;r&#8217; (red).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.s">
+<tt class="descname">s</tt><a class="reference internal" href="_modules/gp/gp.html#GP.s"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard deviation of the observation noise for the gaussian
+process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><strong>s</strong> : numpy.float64</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.x">
+<tt class="descname">x</tt><a class="reference internal" href="_modules/gp/gp.html#GP.x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector of input locations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>x</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\)</span> array, where <span class="math">\(n\)</span> is the number of
+locations.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gp.gp.GP.y">
+<tt class="descname">y</tt><a class="reference internal" href="_modules/gp/gp.html#GP.y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vector of input observations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>y</strong> : numpy.ndarray</p>
+<blockquote class="last">
+<div><p><span class="math">\(n\)</span> array, where <span class="math">\(n\)</span> is the number of
+observations.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Gaussian Processes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gp.kernels.html"
+                        title="next chapter">Kernels</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/gp.gp.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gp.kernels.html" title="Kernels"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Gaussian Processes"
+             >previous</a> |</li>
+        <li><a href="index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jessica B. Hamrick.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

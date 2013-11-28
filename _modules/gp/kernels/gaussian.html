@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>gp.kernels.gaussian &mdash; gaussian_processes 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="gaussian_processes 1.0.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for gp.kernels.gaussian</h1><div class="highlight"><pre>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;GaussianKernel&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="kn">as</span> <span class="nn">sym</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">gp.ext</span> <span class="kn">import</span> <span class="n">gaussian_c</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Kernel</span>
+
+<span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+
+
+<div class="viewcode-block" id="GaussianKernel"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel">[docs]</a><span class="k">class</span> <span class="nc">GaussianKernel</span><span class="p">(</span><span class="n">Kernel</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">    Gaussian kernel function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    h : float</span>
+<span class="sd">        Output scale kernel parameter</span>
+<span class="sd">    w : float</span>
+<span class="sd">        Input scale kernel parameter</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The Gaussian kernel is defined as:</span>
+
+<span class="sd">    .. math:: K(x_1, x_2) = \frac{h^2}{\sqrt{2\pi w^2}}\exp\left(-\frac{(x_1-x_2)^2}{2w^2}\right),</span>
+
+<span class="sd">    where :math:`w` is the input scale parameter (equivalent to the</span>
+<span class="sd">    standard deviation of the Gaussian) and :math:`h` is the output</span>
+<span class="sd">    scale parameter.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="c">#: Output scale kernel parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="c">#: Input scale kernel parameter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;</span>
+<span class="sd">        Kernel parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        params : numpy.ndarray ``(h, w)``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+
+    <span class="nd">@params.setter</span>
+<div class="viewcode-block" id="GaussianKernel.params"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.params">[docs]</a>    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">sym_K</span><span class="p">)</span>
+<div class="viewcode-block" id="GaussianKernel.sym_K"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.sym_K">[docs]</a>    <span class="k">def</span> <span class="nf">sym_K</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;h&#39;</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">sym</span><span class="o">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+
+        <span class="n">h2</span> <span class="o">=</span> <span class="n">h</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">w2</span> <span class="o">=</span> <span class="n">w</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">d</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">h2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">sym</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sym</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">w2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sym</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">d2</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">w2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">f</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+<div class="viewcode-block" id="GaussianKernel.K"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">jacobian</span><span class="p">)</span>
+<div class="viewcode-block" id="GaussianKernel.jacobian"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">jacobian</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">Kernel</span><span class="o">.</span><span class="n">hessian</span><span class="p">)</span>
+<div class="viewcode-block" id="GaussianKernel.hessian"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.hessian">[docs]</a>    <span class="k">def</span> <span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.dK_dh"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.dK_dh">[docs]</a>    <span class="k">def</span> <span class="nf">dK_dh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">dK_dh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.dK_dw"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.dK_dw">[docs]</a>    <span class="k">def</span> <span class="nf">dK_dw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">dK_dw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.d2K_dhdh"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.d2K_dhdh">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dhdh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">d2K_dhdh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.d2K_dhdw"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.d2K_dhdw">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dhdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">d2K_dhdw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.d2K_dwdh"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.d2K_dwdh">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dwdh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">d2K_dwdh</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</div>
+<div class="viewcode-block" id="GaussianKernel.d2K_dwdw"><a class="viewcode-back" href="../../../gp.kernels.GaussianKernel.html#gp.kernels.gaussian.GaussianKernel.d2K_dwdw">[docs]</a>    <span class="k">def</span> <span class="nf">d2K_dwdw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">x1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DTYPE</span><span class="p">)</span>
+        <span class="n">gaussian_c</span><span class="o">.</span><span class="n">d2K_dwdw</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../../np-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Jessica B. Hamrick.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
