@@ -1,4 +1,4 @@
 Gaussian kernel
 ===============
 
-.. autoclass:: gp.kernels.GaussianKernel
+.. autoclass:: gp.kernels.gaussian.GaussianKernel

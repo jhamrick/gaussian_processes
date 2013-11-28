@@ -11,7 +11,7 @@ class Kernel(object):
 
         Returns
         -------
-        kernel : :class:`kernels.Kernel`
+        kernel : :class:`~gp.kernels.base.Kernel`
             New kernel function object of type ``type(self)``.
 
         """

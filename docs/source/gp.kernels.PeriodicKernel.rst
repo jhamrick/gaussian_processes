@@ -1,4 +1,4 @@
 Periodic kernel
 ===============
 
-.. autoclass:: gp.kernels.PeriodicKernel
+.. autoclass:: gp.kernels.periodic.PeriodicKernel
