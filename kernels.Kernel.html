@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -6,15 +8,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Kernel base class &mdash; gaussian_processes 0.1.3 documentation</title>
+    <title>Kernel base class &mdash; gaussian_processes 1.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.3',
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="gaussian_processes 0.1.3 documentation" href="index.html" />
+    <link rel="top" title="gaussian_processes 1.0.0 documentation" href="index.html" />
     <link rel="up" title="Kernels" href="kernels.html" />
     <link rel="next" title="Kernel metaclass" href="kernels.base.KernelMeta.html" />
     <link rel="prev" title="Periodic kernel" href="kernels.PeriodicKernel.html" /> 
@@ -48,7 +50,7 @@
         <li class="right" >
           <a href="kernels.PeriodicKernel.html" title="Periodic kernel"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.1.3 documentation</a> &raquo;</li>
+        <li><a href="index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
           <li><a href="kernels.html" accesskey="U">Kernels</a> &raquo;</li> 
       </ul>
     </div>  
@@ -60,150 +62,6 @@
             
   <div class="section" id="kernel-base-class">
 <h1>Kernel base class<a class="headerlink" href="#kernel-base-class" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="kernels.Kernel">
-<em class="property">class </em><tt class="descclassname">kernels.</tt><tt class="descname">Kernel</tt><a class="headerlink" href="#kernels.Kernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="method">
-<dt id="kernels.Kernel.K">
-<tt class="descname">K</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.Kernel.K" title="Permalink to this definition">¶</a></dt>
-<dd><p>Kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x1</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(n\)</span>-length vector</p>
-</div></blockquote>
-<p><strong>x2</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(m\)</span>-length vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>K</strong> : numpy.ndarray</p>
-<blockquote class="last">
-<div><p><span class="math">\(n\times m\)</span> array</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="kernels.Kernel.copy">
-<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#kernels.Kernel.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a copy of the kernel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>kernel</strong> : <a class="reference internal" href="#kernels.Kernel" title="kernels.Kernel"><tt class="xref py py-class docutils literal"><span class="pre">kernels.Kernel</span></tt></a></p>
-<blockquote class="last">
-<div><p>New kernel function object of type <tt class="docutils literal"><span class="pre">type(self)</span></tt>.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="kernels.Kernel.hessian">
-<tt class="descname">hessian</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.Kernel.hessian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Hessian of the kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x1</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(n\)</span>-length vector</p>
-</div></blockquote>
-<p><strong>x2</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(m\)</span>-length vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>H</strong> : numpy.ndarray</p>
-<blockquote class="last">
-<div><p><span class="math">\(n_p\times n_p\times n\times m\)</span> array, where
-<span class="math">\(n_p\)</span> is the number of kernel parameters. See
-<tt class="xref py py-obj docutils literal"><span class="pre">params</span></tt>.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="kernels.Kernel.jacobian">
-<tt class="descname">jacobian</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="headerlink" href="#kernels.Kernel.jacobian" title="Permalink to this definition">¶</a></dt>
-<dd><p>Jacobian of the kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>x1</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(n\)</span>-length vector</p>
-</div></blockquote>
-<p><strong>x2</strong> : numpy.ndarray with <tt class="docutils literal"><span class="pre">dtype='f8'</span></tt></p>
-<blockquote>
-<div><p><span class="math">\(m\)</span>-length vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>J</strong> : numpy.ndarray</p>
-<blockquote class="last">
-<div><p><span class="math">\(n_p\times n\times m\)</span> array, where <span class="math">\(n_p\)</span> is the
-number of kernel parameters. See <tt class="xref py py-obj docutils literal"><span class="pre">params</span></tt>.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="kernels.Kernel.params">
-<tt class="descname">params</tt><a class="headerlink" href="#kernels.Kernel.params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Kernel parameters.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><strong>params</strong> : tuple</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="kernels.Kernel.sym_K">
-<tt class="descname">sym_K</tt><big>(</big><big>)</big><a class="headerlink" href="#kernels.Kernel.sym_K" title="Permalink to this definition">¶</a></dt>
-<dd><p>Symbolic kernel function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns :</th><td class="field-body"><p class="first"><strong>K</strong> : sympy.Expr</p>
-<blockquote class="last">
-<div><p>A sympy expression representing the symbolic form of the
-kernel function.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 
 
@@ -258,13 +116,13 @@ kernel function.</p>
         <li class="right" >
           <a href="kernels.PeriodicKernel.html" title="Periodic kernel"
              >previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 0.1.3 documentation</a> &raquo;</li>
+        <li><a href="index.html">gaussian_processes 1.0.0 documentation</a> &raquo;</li>
           <li><a href="kernels.html" >Kernels</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Jessica B. Hamrick.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
