@@ -205,38 +205,40 @@ def test_dtypes():
     yield check_dtype, gp.dm_dtheta(xo)
 
 
-def check_shapes():
+def test_shapes():
     gp = make_gp()
     xo = make_xo()
     n = gp.x.size
     m = xo.size
-    # minus one because we're Kxx_J doesn't include s
-    n_p = gp.params.size - 1
+    n_p = gp.params.size
 
-    def check_ndim(x, ndim):
-        assert x.ndim == ndim
+    def check_prop_ndim(x, ndim):
+        assert getattr(gp, x).ndim == ndim
 
-    def check_shape(x, shape):
-        assert x.shape == shape
+    def check_prop_shape(x, shape):
+        assert getattr(gp, x).shape == shape
 
-    yield check_ndim, gp.x, 1
-    yield check_shape, gp.y, (n,)
-    yield check_shape, gp.Kxx, (n, n)
-    yield check_shape, gp.Kxx_J, (n_p, n, n)
-    yield check_shape, gp.Kxx_H, (n_p, n_p, n, n)
-    yield check_shape, gp.Lxx, (n, n)
-    yield check_shape, gp.inv_Lxx, (n, n)
-    yield check_shape, gp.inv_Kxx, (n, n)
-    yield check_shape, gp.inv_Kxx_y, (n,)
-    yield check_shape, gp.dloglh_dtheta, (n_p,)
-    yield check_shape, gp.dlh_dtheta, (n_p,)
-    yield check_shape, gp.d2lh_dtheta2, (n_p, n_p)
-    yield check_shape, gp.Kxoxo(xo), (m, m)
-    yield check_shape, gp.Kxxo(xo), (n, m)
-    yield check_shape, gp.Kxox(xo), (m, n)
-    yield check_shape, gp.mean(xo), (m,)
-    yield check_shape, gp.cov(xo), (m, m)
-    yield check_shape, gp.dm_dtheta(xo), (n_p, m)
+    def check_func_shape(x, shape):
+        assert getattr(gp, x)(xo).shape == shape
+
+    yield check_prop_ndim, 'x', 1
+    yield check_prop_shape, 'y', (n,)
+    yield check_prop_shape, 'Kxx', (n, n)
+    yield check_prop_shape, 'Kxx_J', (n_p-1, n, n)
+    yield check_prop_shape, 'Kxx_H', (n_p-1, n_p-1, n, n)
+    yield check_prop_shape, 'Lxx', (n, n)
+    yield check_prop_shape, 'inv_Lxx', (n, n)
+    yield check_prop_shape, 'inv_Kxx', (n, n)
+    yield check_prop_shape, 'inv_Kxx_y', (n,)
+    yield check_prop_shape, 'dloglh_dtheta', (n_p,)
+    yield check_prop_shape, 'dlh_dtheta', (n_p,)
+    yield check_prop_shape, 'd2lh_dtheta2', (n_p, n_p)
+    yield check_func_shape, 'Kxoxo', (m, m)
+    yield check_func_shape, 'Kxxo', (n, m)
+    yield check_func_shape, 'Kxox', (m, n)
+    yield check_func_shape, 'mean', (m,)
+    yield check_func_shape, 'cov', (m, m)
+    yield check_func_shape, 'dm_dtheta', (n_p, m)
 
 
 def test_memoprop_del():
