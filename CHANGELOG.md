@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.0.0
+
+* Use Cython instead of Numba
+* Create `gp.ext` module to hold Cython code
+* Improve test coverage
+* Enforce usage of 1-dimensional arrays
+
 ## Version 0.1.3
 
 * Fix pip installion bug
