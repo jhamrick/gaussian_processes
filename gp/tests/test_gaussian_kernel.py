@@ -1,17 +1,17 @@
 import scipy.stats
 import numpy as np
 np.seterr(all='raise')
-np.random.seed(2348)
 
 from .. import GaussianKernel
-from .util import opt, rand_params
+from .util import opt, rand_params, seed, allclose
 from .test_kernels import check_params, check_jacobian, check_hessian
+from .test_kernels import check_dK_dtheta, check_d2K_dtheta2
+
+seed()
 
 EPS = np.finfo(float).eps
-
 N_BIG = opt['n_big_test_iters']
 N_SMALL = opt['n_small_test_iters']
-THRESH = opt['error_threshold']
 DTHETA = opt['dtheta']
 
 
@@ -24,12 +24,14 @@ def make_random_kernel():
 
 
 def test_kernel_params():
+    seed()
     for i in xrange(N_BIG):
         params = rand_params('h', 'w')
         yield check_params, GaussianKernel, params
 
 
 def test_K():
+    seed()
     x = np.linspace(-2, 2, 10)
     dx = x[:, None] - x[None, :]
 
@@ -43,7 +45,7 @@ def test_K():
             except FloatingPointError:
                 pdx.flat[i] = 0.0
         pdx *= h ** 2
-        assert (abs(pdx - K) < THRESH).all()
+        assert allclose(pdx, K)
 
     for i in xrange(N_BIG):
         kernel = make_random_kernel()
@@ -66,7 +68,7 @@ def test_sym_K():
                     'h': params[0],
                     'w': params[1]
                 })
-        assert (abs(Ks - K) < THRESH).all()
+        assert allclose(Ks, K)
 
     yield (check_sym_K, (1, 1))
     yield (check_sym_K, (1, 2))
@@ -75,6 +77,7 @@ def test_sym_K():
 
 
 def test_jacobian():
+    seed()
     x = np.linspace(-2, 2, 10)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
@@ -82,7 +85,56 @@ def test_jacobian():
 
 
 def test_hessian():
+    seed()
     x = np.linspace(-2, 2, 10)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_hessian, kernel, x)
+
+
+def test_dK_dh():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_dK_dtheta, kernel, x, 'h', 0)
+
+
+def test_dK_dw():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_dK_dtheta, kernel, x, 'w', 1)
+
+
+def test_d2K_dhdh():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_d2K_dtheta2, kernel, x, 'h', 'h', 0)
+
+
+def test_d2K_dhdw():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_d2K_dtheta2, kernel, x, 'h', 'w', 1)
+
+
+def test_d2K_dwdh():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_d2K_dtheta2, kernel, x, 'w', 'h', 0)
+
+
+def test_d2K_dwdw():
+    seed()
+    x = np.linspace(-2, 2, 10)
+    for i in xrange(N_SMALL):
+        kernel = make_random_kernel()
+        yield (check_d2K_dtheta2, kernel, x, 'w', 'w', 1)

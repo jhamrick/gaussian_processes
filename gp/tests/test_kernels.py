@@ -1,11 +1,9 @@
 import numpy as np
 np.seterr(all='raise')
-np.random.seed(2348)
 
-from .util import opt, approx_deriv
+from .util import opt, approx_deriv, allclose
 
 EPS = np.finfo(float).eps
-THRESH = opt['error_threshold']
 DTHETA = opt['dtheta']
 
 
@@ -32,13 +30,23 @@ def check_jacobian(k, x):
         k1 = kernel(*p1)(x, x)
         approx_jac[i] = approx_deriv(k0, k1, DTHETA)
 
-    diff = jac - approx_jac
-    assert (np.abs(diff) < THRESH).all()
+    assert allclose(jac, approx_jac)
 
 
-# def check_dK_dtheta(kernel, params, x, i):
-#     k = kernel(*params)
-#     dK_dtheta = k.
+def check_dK_dtheta(k, x, p, i):
+    kernel = type(k)
+    params = k.params.copy()
+    dK_dtheta = getattr(k, "dK_d%s" % p)(x, x)
+
+    params0 = list(params)
+    params0[i] -= DTHETA
+    params1 = list(params)
+    params1[i] += DTHETA
+    k0 = kernel(*params0)(x, x)
+    k1 = kernel(*params1)(x, x)
+    approx_dK_dtheta = approx_deriv(k0, k1, DTHETA)
+
+    assert allclose(dK_dtheta, approx_dK_dtheta)
 
 
 def check_hessian(k, x):
@@ -56,5 +64,20 @@ def check_hessian(k, x):
         jac1 = kernel(*p1).jacobian(x, x)
         approx_hess[:, i] = approx_deriv(jac0, jac1, DTHETA)
 
-    diff = hess - approx_hess
-    assert (np.abs(diff) < THRESH).all()
+    assert allclose(hess, approx_hess)
+
+
+def check_d2K_dtheta2(k, x, p1, p2, i):
+    kernel = type(k)
+    params = k.params.copy()
+    d2K_dtheta2 = getattr(k, "d2K_d%sd%s" % (p1, p2))(x, x)
+
+    params0 = list(params)
+    params1 = list(params)
+    params0[i] -= DTHETA
+    params1[i] += DTHETA
+    dK_dtheta0 = getattr(kernel(*params0), "dK_d%s" % p1)(x, x)
+    dK_dtheta1 = getattr(kernel(*params1), "dK_d%s" % p1)(x, x)
+    approx_d2K_dtheta2 = approx_deriv(dK_dtheta0, dK_dtheta1, DTHETA)
+
+    assert allclose(d2K_dtheta2, approx_d2K_dtheta2)

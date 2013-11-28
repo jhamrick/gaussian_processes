@@ -2,16 +2,15 @@ import pytest
 import numpy as np
 from numpy import dot
 np.seterr(all='raise')
-np.random.seed(2348)
 
 from .. import GP
 from .. import GaussianKernel as kernel
-from .util import opt, rand_params, approx_deriv, make_xy, make_xo
+from .util import opt, rand_params, seed, allclose
+from .util import approx_deriv, make_xy, make_xo
 
 EPS = opt['eps']
 N_BIG = opt['n_big_test_iters']
 N_SMALL = opt['n_small_test_iters']
-THRESH = opt['error_threshold']
 DTHETA = opt['dtheta']
 PFAIL = opt['pct_allowed_failures']
 DTYPE = opt['dtype']
@@ -33,7 +32,7 @@ def make_random_gp():
 
 
 def count_failures(check, n):
-    np.random.seed(2348)
+    seed()
 
     params = []
     failures = []
@@ -57,8 +56,7 @@ def count_failures(check, n):
 def test_mean():
     def check_mean(gp):
         gp.s = 0
-        diff = np.abs(gp.mean(gp.x.copy()) - gp.y)
-        assert (diff < THRESH).all(), diff
+        assert allclose(gp.mean(gp.x), gp.y)
 
     count_failures(check_mean, N_BIG)
 
@@ -66,8 +64,7 @@ def test_mean():
 def test_inv():
     def check_inv(gp):
         I = dot(gp.Kxx, gp.inv_Kxx)
-        diff = np.abs(I - np.eye(I.shape[0]))
-        assert (diff < THRESH).all(), diff
+        assert allclose(I, np.eye(I.shape[0]))
 
     count_failures(check_inv, N_SMALL)
 
@@ -92,7 +89,7 @@ def test_dloglh():
             approx_jac[i] = approx_deriv(
                 gp0.log_lh, gp1.log_lh, DTHETA)
 
-        assert (np.abs(jac - approx_jac) < THRESH).all()
+        assert allclose(jac, approx_jac)
 
     count_failures(check_dloglh, N_BIG)
 
@@ -117,7 +114,7 @@ def test_dlh():
             approx_jac[i] = approx_deriv(
                 gp0.lh, gp1.lh, DTHETA)
 
-        assert (np.abs(jac - approx_jac) < THRESH).all()
+        assert allclose(jac, approx_jac)
 
     count_failures(check_dlh, N_BIG)
 
@@ -142,7 +139,7 @@ def test_d2lh():
             approx_hess[:, i] = approx_deriv(
                 gp0.dlh_dtheta, gp1.dlh_dtheta, DTHETA)
 
-        assert (np.abs(hess - approx_hess) < THRESH).all()
+        assert allclose(hess, approx_hess)
 
     count_failures(check_d2lh, N_BIG)
 
@@ -169,7 +166,7 @@ def test_dm():
             approx_jac[i] = approx_deriv(
                 gp0.mean(xo), gp1.mean(xo), DTHETA)
 
-        assert (np.abs(jac - approx_jac) < THRESH).all()
+        assert allclose(jac, approx_jac)
 
     count_failures(check_dm, N_BIG)
 

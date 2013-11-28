@@ -5,7 +5,7 @@ opt = {
     'n_big_test_iters': 100,
     'n_small_test_iters': 10,
     'pct_allowed_failures': 5,
-    'error_threshold': 1e-4,
+    'error_threshold': 1e-5,
     'dtheta': 1e-5,
     'dtype': np.float64,
     'eps': np.finfo(np.float64).eps,
@@ -42,3 +42,11 @@ def make_xy():
 def make_xo():
     xo = np.linspace(-2*np.pi, 2*np.pi, 32).astype(opt['dtype'])
     return xo
+
+
+def seed():
+    np.random.seed(2348)
+
+
+def allclose(x, y):
+    return np.allclose(x, y, rtol=opt['error_threshold'])
