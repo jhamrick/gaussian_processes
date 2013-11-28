@@ -1,4 +1,4 @@
 Kernel base class
 =================
 
-.. autoclass:: kernels.Kernel
+.. autoclass:: gp.kernels.Kernel
