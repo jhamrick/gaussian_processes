@@ -60,10 +60,15 @@ class GP(object):
 
         """
         self._memoized = {}
+        self._x = None
+        self._y = None
+        self._s = None
+        self.n = 0
 
         #: Kernel for the gaussian process, of type
         #: :class:`kernels.Kernel`
         self.K = K
+        self._params = np.empty(K.params.size + 1, dtype=DTYPE)
 
         self.x = x
         self.y = y
@@ -85,9 +90,10 @@ class GP(object):
 
     @x.setter
     def x(self, val):
-        self._memoized = {}
-        self._x = val.astype(DTYPE)
-        self.n, = self.x.shape
+        if np.any(val != self._x):
+            self._memoized = {}
+            self._x = val.astype(DTYPE)
+            self.n, = self.x.shape
 
     @property
     def y(self):
@@ -105,10 +111,11 @@ class GP(object):
 
     @y.setter
     def y(self, val):
-        self._memoized = {}
-        self._y = val.astype(DTYPE)
-        if self.y.shape != (self.n,):
-            raise ValueError("invalid shape for y: %s" % str(self.y.shape))
+        if np.any(val != self._y):
+            self._memoized = {}
+            self._y = val.astype(DTYPE)
+            if self.y.shape != (self.n,):
+                raise ValueError("invalid shape for y: %s" % str(self.y.shape))
 
     @property
     def s(self):
@@ -125,8 +132,9 @@ class GP(object):
 
     @s.setter
     def s(self, val):
-        self._memoized = {}
-        self._s = DTYPE(val)
+        if val != self._s:
+            self._memoized = {}
+            self._s = DTYPE(val)
 
     @property
     def params(self):
@@ -140,15 +148,15 @@ class GP(object):
            observation noise parameter, :math:`s`, in that order.
 
         """
-        return np.concatenate([self.K.params, [self._s]])
+        self._params[:-1] = self.K.params
+        self._params[-1] = self._s
+        return self._params
 
     @params.setter
     def params(self, val):
-        params = self.params
-        if (params[:-1] != val[:-1]).any():
+        if np.any(self.params != val):
             self._memoized = {}
             self.K.params = val[:-1]
-        if params[-1] != val[-1]:
             self.s = val[-1]
 
     def copy(self):
