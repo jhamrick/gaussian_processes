@@ -1,7 +1,7 @@
-Gaussian process module
+Gaussian process object
 =======================
 
-.. automodule:: gp
+.. autoclass:: gp.gp.GP
     :members:
     :undoc-members:
     :show-inheritance:

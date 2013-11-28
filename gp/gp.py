@@ -43,7 +43,7 @@ class GP(object):
 
     Parameters
     ----------
-    K : :class:`kernels.Kernel`
+    K : :class:`~gp.kernels.base.Kernel`
         Kernel object
     x : numpy.ndarray
         :math:`n` array of input locations
@@ -66,7 +66,7 @@ class GP(object):
         self.n = 0
 
         #: Kernel for the gaussian process, of type
-        #: :class:`kernels.Kernel`
+        #: :class:`~gp.kernels.base.Kernel`
         self.K = K
         self._params = np.empty(K.params.size + 1, dtype=DTYPE)
 
@@ -165,7 +165,7 @@ class GP(object):
 
         Returns
         -------
-        gp : :class:`gp.GP`
+        gp : :class:`~gp.gp.GP`
             New gaussian process object
 
         """
