@@ -8,6 +8,7 @@ from gp.ext import gaussian_c
 from . import Kernel
 
 DTYPE = np.float64
+EPS = np.finfo(DTYPE).eps
 
 
 class GaussianKernel(Kernel):
@@ -34,6 +35,11 @@ class GaussianKernel(Kernel):
     """
 
     def __init__(self, h, w):
+        if h < EPS:
+            raise ValueError("invalid value for h: %s" % h)
+        if w < EPS:
+            raise ValueError("invalid value for w: %s" % w)
+
         self.h = DTYPE(h) #: Output scale kernel parameter
         self.w = DTYPE(w) #: Input scale kernel parameter
 
@@ -52,6 +58,12 @@ class GaussianKernel(Kernel):
     @params.setter
     def params(self, val):
         h, w = val
+
+        if h < EPS:
+            raise ValueError("invalid value for h: %s" % h)
+        if w < EPS:
+            raise ValueError("invalid value for w: %s" % w)
+
         self.h = DTYPE(h)
         self.w = DTYPE(w)
 
@@ -66,7 +78,7 @@ class GaussianKernel(Kernel):
         w2 = w ** 2
         d2 = d ** 2
 
-        f = h2 * (1. / sym.sqrt(2*sym.pi*w2)) * sym.exp(-d2 / (2.0 * w2))
+        f = h2 * (1. / sym.sqrt(2 * sym.pi * w2)) * sym.exp(-d2 / (2.0 * w2))
         return f
 
     @wraps(Kernel.K)

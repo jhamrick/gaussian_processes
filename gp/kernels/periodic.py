@@ -8,6 +8,7 @@ from gp.ext import periodic_c
 from . import Kernel
 
 DTYPE = np.float64
+EPS = np.finfo(DTYPE).eps
 
 
 class PeriodicKernel(Kernel):
@@ -36,6 +37,13 @@ class PeriodicKernel(Kernel):
     """
 
     def __init__(self, h, w, p):
+        if h < EPS:
+            raise ValueError("invalid value for h: %s" % h)
+        if w < EPS:
+            raise ValueError("invalid value for w: %s" % w)
+        if p < EPS:
+            raise ValueError("invalid value for p: %s" % w)
+
         self.h = DTYPE(h) #: Output scale kernel parameter
         self.w = DTYPE(w) #: Input scale kernel parameter
         self.p = DTYPE(p) #: Period kernel parameter
@@ -55,6 +63,14 @@ class PeriodicKernel(Kernel):
     @params.setter
     def params(self, val):
         h, w, p = val
+
+        if h < EPS:
+            raise ValueError("invalid value for h: %s" % h)
+        if w < EPS:
+            raise ValueError("invalid value for w: %s" % w)
+        if p < EPS:
+            raise ValueError("invalid value for p: %s" % w)
+
         self.h = DTYPE(h)
         self.w = DTYPE(w)
         self.p = DTYPE(p)
@@ -70,7 +86,7 @@ class PeriodicKernel(Kernel):
         h2 = h ** 2
         w2 = w ** 2
 
-        f = h2 * sym.exp(-2.*(sym.sin(d / (2.*p)) ** 2) / w2)
+        f = h2 * sym.exp(-2. * (sym.sin(d / (2. * p)) ** 2) / w2)
         return f
 
     @wraps(Kernel.K)

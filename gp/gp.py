@@ -4,9 +4,11 @@ import numpy as np
 import copy
 import matplotlib.pyplot as plt
 import scipy.optimize as optim
-import warnings
+import logging
 
 from .ext import gp_c
+
+logger = logging.getLogger("gp.gp")
 
 DTYPE = np.float64
 EPS = np.finfo(DTYPE).eps
@@ -132,6 +134,9 @@ class GP(object):
 
     @s.setter
     def s(self, val):
+        if val < 0:
+            raise ValueError("invalid value for s: %s" % val)
+
         if val != self._s:
             self._memoized = {}
             self._s = DTYPE(val)
@@ -303,7 +308,11 @@ class GP(object):
         """
         y = self._y
         K = self.Kxx
-        Kiy = self.inv_Kxx_y
+        try:
+            Kiy = self.inv_Kxx_y
+        except np.linalg.LinAlgError:
+            return -np.inf
+
         return DTYPE(gp_c.log_lh(y, K, Kiy))
 
     @memoprop
@@ -361,7 +370,12 @@ class GP(object):
 
         y = self._y
         dloglh = np.empty(len(self.params))
-        Ki = self.inv_Kxx
+        try:
+            Ki = self.inv_Kxx
+        except np.linalg.LinAlgError:
+            dloglh.fill(-np.inf)
+            return dloglh
+
         Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
         gp_c.dloglh_dtheta(y, Ki, Kj, Kiy, self._s, dloglh)
@@ -623,8 +637,7 @@ class GP(object):
         ax.plot(x, y, 'o', ms=7, color=markercolor)
         ax.set_xlim(*xlim)
 
-    def fit_MLII(self, params_to_fit, bounds=None,
-                 randf=None, nrestart=5, verbose=False):
+    def fit_MLII(self, params_to_fit, randf=None, nrestart=5, verbose=False):
         """
         Fit parameters of the gaussian process using MLII (maximum
         likelihood) estimation.
@@ -641,12 +654,6 @@ class GP(object):
             A list of booleans corresponding to the gaussian process
             parameters, indicating which parameters should be
             fit. Parameters which are not fit keep their current value.
-
-        bounds : list of tuples (optional)
-            The upper and lower bounds for each parameter that is being
-            fit; use ``None`` to specify no bound. If not specified,
-            the bounds default to ``(EPS, None)``, where
-            ``EPS=numpy.finfo(float).eps``.
 
         randf : list of functions (optional)
             A list of functions to give an initial starting value for
@@ -669,11 +676,8 @@ class GP(object):
         # boolean array of which parameters to fit
         fitmask = np.array(params_to_fit, dtype='bool')
 
-        # default for bounds
-        if bounds is None:
-            bounds = tuple((EPS, None) for p in params_to_fit if p)
         # default for randf
-        if randf is None:
+        if not randf:
             randf = tuple(
                 lambda: np.abs(np.random.normal())
                 for p in params_to_fit if p)
@@ -690,44 +694,55 @@ class GP(object):
 
         # update the GP object with new parameter values
         def new_params(theta):
-            th = np.array(theta).ravel()
-            out = [params[i] if j is None else th[j]
+            out = [params[i] if j is None else theta[j]
                    for i, j in enumerate(iparam)]
             return out
 
         # negative log likelihood
         def f(theta):
-            self.params = new_params(theta)
-            out = -self.log_lh
+            params = new_params(theta)
+            try:
+                self.params = params
+            except ValueError:
+                out = np.inf
+            else:
+                out = -self.log_lh
             return out
 
         # jacobian of the negative log likelihood
         def df(theta):
-            self.params = new_params(theta)
-            out = -self.dloglh_dtheta[fitmask]
+            params = new_params(theta)
+            try:
+                self.params = params
+            except ValueError:
+                out = np.empty(len(theta))
+                out.fill(np.inf)
+            else:
+                out = -self.dloglh_dtheta[fitmask]
             return out
 
-        def cb(theta):
-            print theta
-
         # run the optimization a few times to find the best fit
-        args = np.empty((nrestart, len(bounds)))
+        args = np.empty((nrestart, len(randf)))
         fval = np.empty(nrestart)
         for i in xrange(nrestart):
-            p0 = tuple(r() for r in randf)
-            self.params = new_params(p0)
-            if verbose:
-                print "      p0 = %s" % (p0,)
+            p0_i = tuple(r() for r in randf)
+            self.params = new_params(p0_i)
+            logger.debug("p0 = %s", p0_i)
             popt = optim.minimize(
-                fun=f, x0=p0, jac=df, method='L-BFGS-B', bounds=bounds)
+                fun=f, x0=p0_i, jac=df, method='L-BFGS-B',
+                options={'disp': verbose})
+
             args[i] = popt['x']
             fval[i] = popt['fun']
-            if verbose:
-                print "      -MLL(%s) = %f" % (args[i], fval[i])
+
+            logger.debug("-MLL(%s) = %f", args[i], fval[i])
+            if not popt['success']:
+                fval[i] = np.nan
 
         # choose the parameters that give the best MLL
-        if args is None or fval is None:
+        if np.isnan(fval).all():
             raise RuntimeError("Could not find MLII parameter estimates")
 
         # update our parameters
-        self.params = new_params(args[np.argmin(fval)])
+        self.params = new_params(args[np.nanargmin(fval)])
+        logger.info("Best parameters: %s", self.params)
