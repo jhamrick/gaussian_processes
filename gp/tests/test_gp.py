@@ -340,15 +340,12 @@ def test_plot():
 
     fig, ax = plt.subplots()
     gp.plot(ax=ax)
-    plt.show()
 
     fig, ax = plt.subplots()
     gp.plot()
-    plt.show()
 
     fig, ax = plt.subplots()
     gp.plot(xlim=[0, 1])
-    plt.show()
 
     plt.close('all')
 
