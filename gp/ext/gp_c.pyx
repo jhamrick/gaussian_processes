@@ -19,7 +19,7 @@ def log_lh(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] K, np.ndar
 
     sign, logdet = np.linalg.slogdet(K)
     if sign != 1:
-        llh = INFINITY
+        llh = -INFINITY
 
     else:
         data_fit = -0.5 * DTYPE(np.dot(y, Kiy))
