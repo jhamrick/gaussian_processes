@@ -1,5 +1,4 @@
 import numpy as np
-np.seterr(all='raise')
 
 from .. import PeriodicKernel
 from .util import opt, rand_params, seed, allclose

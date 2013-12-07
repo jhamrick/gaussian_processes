@@ -1,5 +1,4 @@
 import numpy as np
-np.seterr(all='raise')
 
 from .util import opt, approx_deriv, allclose
 

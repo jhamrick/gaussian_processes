@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 from numpy import dot
-np.seterr(all='raise')
 
 from .. import GP
 from .. import GaussianKernel as kernel

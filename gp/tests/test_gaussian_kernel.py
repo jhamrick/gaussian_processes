@@ -1,6 +1,5 @@
 import scipy.stats
 import numpy as np
-np.seterr(all='raise')
 
 from .. import GaussianKernel
 from .util import opt, rand_params, seed, allclose
