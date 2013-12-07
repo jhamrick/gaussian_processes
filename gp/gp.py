@@ -753,7 +753,7 @@ class GP(object):
             fval[i] = popt['fun']
 
             logger.debug("-MLL(%s) = %f", args[i], fval[i])
-            if not popt['success']:
+            if not popt['success'] or np.isinf(fval[i]):
                 fval[i] = np.nan
 
         # choose the parameters that give the best MLL
