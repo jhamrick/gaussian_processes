@@ -30,7 +30,7 @@ def test_kernel_params():
 
 def test_K():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     dx = x[:, None] - x[None, :]
 
     def check_K(kernel):
@@ -72,7 +72,7 @@ def test_sym_K():
 
 def test_jacobian():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_jacobian, kernel, x)
@@ -80,7 +80,7 @@ def test_jacobian():
 
 def test_hessian():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_hessian, kernel, x)
@@ -88,7 +88,7 @@ def test_hessian():
 
 def test_dK_dh():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_dK_dtheta, kernel, x, 'h', 0)
@@ -96,7 +96,7 @@ def test_dK_dh():
 
 def test_dK_dw():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_dK_dtheta, kernel, x, 'w', 1)
@@ -104,7 +104,7 @@ def test_dK_dw():
 
 def test_dK_dp():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_dK_dtheta, kernel, x, 'p', 2)
@@ -112,7 +112,7 @@ def test_dK_dp():
 
 def test_d2K_dhdh():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'h', 'h', 0)
@@ -120,7 +120,7 @@ def test_d2K_dhdh():
 
 def test_d2K_dhdw():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'h', 'w', 1)
@@ -128,7 +128,7 @@ def test_d2K_dhdw():
 
 def test_d2K_dhdp():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'h', 'p', 2)
@@ -136,7 +136,7 @@ def test_d2K_dhdp():
 
 def test_d2K_dwdh():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'w', 'h', 0)
@@ -144,7 +144,7 @@ def test_d2K_dwdh():
 
 def test_d2K_dwdw():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'w', 'w', 1)
@@ -152,7 +152,7 @@ def test_d2K_dwdw():
 
 def test_d2K_dwdp():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'w', 'p', 2)
@@ -160,7 +160,7 @@ def test_d2K_dwdp():
 
 def test_d2K_dpdh():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'p', 'h', 0)
@@ -168,7 +168,7 @@ def test_d2K_dpdh():
 
 def test_d2K_dpdw():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'p', 'w', 1)
@@ -176,7 +176,7 @@ def test_d2K_dpdw():
 
 def test_d2K_dpdp():
     seed()
-    x = np.linspace(-2*np.pi, 2*np.pi, 16)
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16)
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'p', 'p', 2)

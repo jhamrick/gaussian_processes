@@ -34,13 +34,13 @@ def approx_deriv(y0, y1, dx):
 
 
 def make_xy():
-    x = np.linspace(-2*np.pi, 2*np.pi, 16).astype(opt['dtype'])
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 16).astype(opt['dtype'])
     y = np.sin(x)
     return x, y
 
 
 def make_xo():
-    xo = np.linspace(-2*np.pi, 2*np.pi, 32).astype(opt['dtype'])
+    xo = np.linspace(-2 * np.pi, 2 * np.pi, 32).astype(opt['dtype'])
     return xo
 
 
