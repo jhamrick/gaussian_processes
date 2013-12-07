@@ -1,5 +1,12 @@
+[run]
+branch = true
+source =
+    gp/
+
 [report]
 exclude_lines =
+    pragma: no cover
     raise NotImplementedError
     if __name__ == .__main__.:
-    def plot
+    except KeyboardInterrupt
+show_missing = true
