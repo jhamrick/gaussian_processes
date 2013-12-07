@@ -96,6 +96,8 @@ class GP(object):
             self._memoized = {}
             self._x = val.astype(DTYPE)
             self.n, = self.x.shape
+        else: # pragma: no cover
+            pass
 
     @property
     def y(self):
@@ -118,6 +120,8 @@ class GP(object):
             self._y = val.astype(DTYPE)
             if self.y.shape != (self.n,):
                 raise ValueError("invalid shape for y: %s" % str(self.y.shape))
+        else: # pragma: no cover
+            pass
 
     @property
     def s(self):
@@ -163,6 +167,8 @@ class GP(object):
             self._memoized = {}
             self.K.params = val[:-1]
             self.s = val[-1]
+        else: # pragma: no cover
+            pass
 
     def copy(self):
         """
@@ -373,7 +379,7 @@ class GP(object):
         try:
             Ki = self.inv_Kxx
         except np.linalg.LinAlgError:
-            dloglh.fill(-np.inf)
+            dloglh.fill(np.nan)
             return dloglh
 
         Kj = self.Kxx_J
@@ -402,7 +408,12 @@ class GP(object):
 
         y = self._y
         dlh = np.empty(len(self.params))
-        Ki = self.inv_Kxx
+        try:
+            Ki = self.inv_Kxx
+        except np.linalg.LinAlgError:
+            dlh.fill(np.nan)
+            return dlh
+
         Kj = self.Kxx_J
         Kiy = self.inv_Kxx_y
         lh = self.lh
@@ -429,13 +440,19 @@ class GP(object):
         """
 
         y = self._y
-        Ki = self.inv_Kxx
+        d2lh = np.empty((len(self.params), len(self.params)))
+        try:
+            Ki = self.inv_Kxx
+        except np.linalg.LinAlgError:
+            d2lh.fill(np.nan)
+            return d2lh
+
         Kj = self.Kxx_J
         Kh = self.Kxx_H
         Kiy = self.inv_Kxx_y
         lh = self.lh
         dlh = self.dlh_dtheta
-        d2lh = np.empty((len(self.params), len(self.params)))
+
         gp_c.d2lh_dtheta2(y, Ki, Kj, Kh, Kiy, self._s, lh, dlh, d2lh)
         return d2lh
 

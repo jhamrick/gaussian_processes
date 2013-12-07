@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
 from numpy import dot
+import matplotlib.pyplot as plt
 
 from .. import GP
 from .. import GaussianKernel as kernel
@@ -39,7 +40,7 @@ def count_failures(check, n):
         gp = make_random_gp()
         try:
             check(gp)
-        except AssertionError as err:
+        except AssertionError as err: # pragma: no cover
             params.append(tuple(gp.params))
             failures.append(err.msg)
 
@@ -223,8 +224,8 @@ def test_shapes():
     yield check_prop_ndim, 'x', 1
     yield check_prop_shape, 'y', (n,)
     yield check_prop_shape, 'Kxx', (n, n)
-    yield check_prop_shape, 'Kxx_J', (n_p-1, n, n)
-    yield check_prop_shape, 'Kxx_H', (n_p-1, n_p-1, n, n)
+    yield check_prop_shape, 'Kxx_J', (n_p - 1, n, n)
+    yield check_prop_shape, 'Kxx_H', (n_p - 1, n_p - 1, n, n)
     yield check_prop_shape, 'Lxx', (n, n)
     yield check_prop_shape, 'inv_Lxx', (n, n)
     yield check_prop_shape, 'inv_Kxx', (n, n)
@@ -283,3 +284,70 @@ def test_set_y():
     y = gp.y.copy()
     with pytest.raises(ValueError):
         gp.y = y[:, None]
+
+
+def test_set_params():
+    x, y = make_xy()
+    h, w = rand_params('h', 'w')
+    GP(kernel(h, w), x, y, s=0)
+
+    with pytest.raises(ValueError):
+        GP(kernel(h, w), x, y, s=-1)
+
+
+def test_invalid_params():
+    h = 0.53356762
+    w = 2.14797803
+    s = 0
+
+    x = np.array([0.0, 0.3490658503988659, 0.6981317007977318,
+                  1.0471975511965976, 1.3962634015954636, 1.7453292519943295,
+                  2.0943951023931953, 0.41968261, 0.97349106, 1.51630532,
+                  1.77356282, 2.07011378, 2.87018553, 3.70955074, 3.96680824,
+                  4.50962249, 4.80617345, 5.06343095, 5.6062452])
+
+    y = np.array([-5.297411814764175e-16, 2.2887507861169e-16,
+                  1.1824308893126911e-15, 1.9743321560961036e-15,
+                  3.387047586844716e-15, 3.2612801348363973e-15,
+                  2.248201624865942e-15, -3.061735126365188e-05,
+                  2.1539042816804896e-05, -3.900581031467468e-05,
+                  4.603140942399664e-05, 0.00014852070373963522,
+                  -0.011659908151004955, -0.001060998167383152,
+                  -0.0002808538329216448, -8.057870658869265e-06,
+                  -7.668984947838558e-07, -7.910215881378919e-08,
+                  -3.2649468298271893e-10])
+
+    gp = GP(kernel(h, w), x, y, s=s)
+
+    with pytest.raises(np.linalg.LinAlgError):
+        gp.Lxx
+    with pytest.raises(np.linalg.LinAlgError):
+        gp.inv_Lxx
+    with pytest.raises(np.linalg.LinAlgError):
+        gp.inv_Kxx
+    with pytest.raises(np.linalg.LinAlgError):
+        gp.inv_Kxx_y
+
+    assert gp.log_lh == -np.inf
+    assert gp.lh == 0
+    assert np.isnan(gp.dloglh_dtheta).all()
+    assert np.isnan(gp.dlh_dtheta).all()
+    assert np.isnan(gp.d2lh_dtheta2).all()
+
+
+def test_plot():
+    gp = make_gp()
+
+    fig, ax = plt.subplots()
+    gp.plot(ax=ax)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    gp.plot()
+    plt.show()
+
+    fig, ax = plt.subplots()
+    gp.plot(xlim=[0, 1])
+    plt.show()
+
+    plt.close('all')
