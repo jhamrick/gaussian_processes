@@ -754,6 +754,7 @@ class GP(object):
 
             logger.debug("-MLL(%s) = %f", args[i], fval[i])
             if not popt['success'] or np.isinf(fval[i]):
+                logger.warning("MLII failed, p=%s" % args[i])
                 fval[i] = np.nan
 
         # choose the parameters that give the best MLL
