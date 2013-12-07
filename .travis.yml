@@ -23,7 +23,7 @@ install:
 - python setup.py build_ext --inplace
 
 script: 
-- py.test --cov gp
+- xvfb-run --server-args="-screen 0 1024x768x24" py.test --cov gp
 
 after_success: 
 - coveralls
