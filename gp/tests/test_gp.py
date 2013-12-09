@@ -388,3 +388,15 @@ def test_fit_MLII():
     fw = lambda: w
     with pytest.raises(RuntimeError):
         gp.fit_MLII([True, True, False], randf=(fh, fw), nrestart=1)
+
+
+@pytest.mark.xfail
+def test_fit_same():
+    params = None
+    for i in xrange(10):
+        gp = make_gp()
+        seed()
+        gp.fit_MLII([True, True, False])
+        if params is None:
+            params = gp.params.copy()
+        assert (params == gp.params).all()

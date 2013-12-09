@@ -694,7 +694,7 @@ class GP(object):
         fitmask = np.array(params_to_fit, dtype='bool')
 
         # default for randf
-        if not randf:
+        if randf is None:
             randf = tuple(
                 lambda: np.abs(np.random.normal())
                 for p in params_to_fit if p)
