@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.2
+
+* Miscellaneous bugfixes
+
 ## Version 1.0.1
 
 * Fix bugs in compiling documentation
