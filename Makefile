@@ -31,7 +31,7 @@ test:
 gh-pages:
 	make clean || true
 	git checkout gh-pages
-	rm -rf _sources _static _modules
+	rm -rf _sources _static _modules htmlcov
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
 	pandoc --from markdown --to rst -o README.rst README.md
