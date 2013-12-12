@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Kernel base class &mdash; gaussian_processes 1.0.1 documentation</title>
+    <title>Kernel base class &mdash; gaussian_processes 1.0.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.0.1',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="gaussian_processes 1.0.1 documentation" href="index.html" />
+    <link rel="top" title="gaussian_processes 1.0.2 documentation" href="index.html" />
     <link rel="up" title="Kernels" href="gp.kernels.html" />
     <link rel="prev" title="Periodic kernel" href="gp.kernels.PeriodicKernel.html" /> 
   </head>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="gp.kernels.PeriodicKernel.html" title="Periodic kernel"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="gp.kernels.html" accesskey="U">Kernels</a> &raquo;</li> 
       </ul>
     </div>  
@@ -64,7 +64,7 @@
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="method">
 <dt id="gp.kernels.base.Kernel.K">
-<tt class="descname">K</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.K" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">K</tt><big>(</big><em>x1</em>, <em>x2</em>, <em>out=None</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.K" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -110,7 +110,7 @@
 
 <dl class="method">
 <dt id="gp.kernels.base.Kernel.hessian">
-<tt class="descname">hessian</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.hessian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.hessian" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">hessian</tt><big>(</big><em>x1</em>, <em>x2</em>, <em>out=None</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.hessian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.hessian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Hessian of the kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -140,7 +140,7 @@
 
 <dl class="method">
 <dt id="gp.kernels.base.Kernel.jacobian">
-<tt class="descname">jacobian</tt><big>(</big><em>x1</em>, <em>x2</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.jacobian" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">jacobian</tt><big>(</big><em>x1</em>, <em>x2</em>, <em>out=None</em><big>)</big><a class="reference internal" href="_modules/gp/kernels/base.html#Kernel.jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.kernels.base.Kernel.jacobian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Jacobian of the kernel function evaluated at <tt class="xref py py-obj docutils literal"><span class="pre">x1</span></tt> and <tt class="xref py py-obj docutils literal"><span class="pre">x2</span></tt>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -250,7 +250,7 @@ kernel function.</p>
         <li class="right" >
           <a href="gp.kernels.PeriodicKernel.html" title="Periodic kernel"
              >previous</a> |</li>
-        <li><a href="index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="gp.kernels.html" >Kernels</a> &raquo;</li> 
       </ul>
     </div>

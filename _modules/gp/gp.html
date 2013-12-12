@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gp.gp &mdash; gaussian_processes 1.0.1 documentation</title>
+    <title>gp.gp &mdash; gaussian_processes 1.0.2 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.0.1',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="gaussian_processes 1.0.1 documentation" href="../../index.html" />
+    <link rel="top" title="gaussian_processes 1.0.2 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -59,9 +59,11 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">scipy.optimize</span> <span class="kn">as</span> <span class="nn">optim</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">.ext</span> <span class="kn">import</span> <span class="n">gp_c</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;gp.gp&quot;</span><span class="p">)</span>
 
 <span class="n">DTYPE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
 <span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">DTYPE</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
@@ -149,6 +151,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">DTYPE</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+            <span class="k">pass</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -171,6 +175,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">DTYPE</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;invalid shape for y: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+            <span class="k">pass</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -187,6 +193,9 @@
 
     <span class="nd">@s.setter</span>
 <div class="viewcode-block" id="GP.s"><a class="viewcode-back" href="../../gp.gp.html#gp.gp.GP.s">[docs]</a>    <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;invalid value for s: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
@@ -213,6 +222,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_memoized</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">val</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c"># pragma: no cover</span>
+            <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="GP.copy"><a class="viewcode-back" href="../../gp.gp.html#gp.gp.GP.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -358,7 +369,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
         <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx</span>
-        <span class="n">Kiy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Kiy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
         <span class="k">return</span> <span class="n">DTYPE</span><span class="p">(</span><span class="n">gp_c</span><span class="o">.</span><span class="n">log_lh</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">Kiy</span><span class="p">))</span>
 </div>
     <span class="nd">@memoprop</span>
@@ -416,7 +431,12 @@
 
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
         <span class="n">dloglh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
-        <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="n">dloglh</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dloglh</span>
+
         <span class="n">Kj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx_J</span>
         <span class="n">Kiy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span>
         <span class="n">gp_c</span><span class="o">.</span><span class="n">dloglh_dtheta</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kj</span><span class="p">,</span> <span class="n">Kiy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">dloglh</span><span class="p">)</span>
@@ -443,7 +463,12 @@
 
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
         <span class="n">dlh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">))</span>
-        <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="n">dlh</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dlh</span>
+
         <span class="n">Kj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx_J</span>
         <span class="n">Kiy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span>
         <span class="n">lh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lh</span>
@@ -470,13 +495,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
-        <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="n">d2lh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Ki</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx</span>
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
+            <span class="n">d2lh</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">d2lh</span>
+
         <span class="n">Kj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx_J</span>
         <span class="n">Kh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Kxx_H</span>
         <span class="n">Kiy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_Kxx_y</span>
         <span class="n">lh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lh</span>
         <span class="n">dlh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dlh_dtheta</span>
-        <span class="n">d2lh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)))</span>
+
         <span class="n">gp_c</span><span class="o">.</span><span class="n">d2lh_dtheta2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">Ki</span><span class="p">,</span> <span class="n">Kj</span><span class="p">,</span> <span class="n">Kh</span><span class="p">,</span> <span class="n">Kiy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="p">,</span> <span class="n">lh</span><span class="p">,</span> <span class="n">dlh</span><span class="p">,</span> <span class="n">d2lh</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">d2lh</span>
 </div>
@@ -678,8 +709,7 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">markercolor</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">*</span><span class="n">xlim</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="GP.fit_MLII"><a class="viewcode-back" href="../../gp.gp.html#gp.gp.GP.fit_MLII">[docs]</a>    <span class="k">def</span> <span class="nf">fit_MLII</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_to_fit</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">randf</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nrestart</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="GP.fit_MLII"><a class="viewcode-back" href="../../gp.gp.html#gp.gp.GP.fit_MLII">[docs]</a>    <span class="k">def</span> <span class="nf">fit_MLII</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_to_fit</span><span class="p">,</span> <span class="n">randf</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">nrestart</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fit parameters of the gaussian process using MLII (maximum</span>
 <span class="sd">        likelihood) estimation.</span>
@@ -696,12 +726,6 @@
 <span class="sd">            A list of booleans corresponding to the gaussian process</span>
 <span class="sd">            parameters, indicating which parameters should be</span>
 <span class="sd">            fit. Parameters which are not fit keep their current value.</span>
-
-<span class="sd">        bounds : list of tuples (optional)</span>
-<span class="sd">            The upper and lower bounds for each parameter that is being</span>
-<span class="sd">            fit; use ``None`` to specify no bound. If not specified,</span>
-<span class="sd">            the bounds default to ``(EPS, None)``, where</span>
-<span class="sd">            ``EPS=numpy.finfo(float).eps``.</span>
 
 <span class="sd">        randf : list of functions (optional)</span>
 <span class="sd">            A list of functions to give an initial starting value for</span>
@@ -724,9 +748,6 @@
         <span class="c"># boolean array of which parameters to fit</span>
         <span class="n">fitmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params_to_fit</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;bool&#39;</span><span class="p">)</span>
 
-        <span class="c"># default for bounds</span>
-        <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">bounds</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">EPS</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params_to_fit</span> <span class="k">if</span> <span class="n">p</span><span class="p">)</span>
         <span class="c"># default for randf</span>
         <span class="k">if</span> <span class="n">randf</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">randf</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
@@ -745,47 +766,59 @@
 
         <span class="c"># update the GP object with new parameter values</span>
         <span class="k">def</span> <span class="nf">new_params</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-            <span class="n">th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">th</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">theta</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iparam</span><span class="p">)]</span>
             <span class="k">return</span> <span class="n">out</span>
 
         <span class="c"># negative log likelihood</span>
         <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">log_lh</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">log_lh</span>
             <span class="k">return</span> <span class="n">out</span>
 
         <span class="c"># jacobian of the negative log likelihood</span>
         <span class="k">def</span> <span class="nf">df</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dloglh_dtheta</span><span class="p">[</span><span class="n">fitmask</span><span class="p">]</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dloglh_dtheta</span><span class="p">[</span><span class="n">fitmask</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">out</span>
 
-        <span class="k">def</span> <span class="nf">cb</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
-            <span class="k">print</span> <span class="n">theta</span>
-
         <span class="c"># run the optimization a few times to find the best fit</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nrestart</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nrestart</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">randf</span><span class="p">)))</span>
         <span class="n">fval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">nrestart</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">nrestart</span><span class="p">):</span>
-            <span class="n">p0</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">randf</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&quot;      p0 = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">p0</span><span class="p">,)</span>
+            <span class="n">p0_i</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">randf</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">p0_i</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;p0 = </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">p0_i</span><span class="p">)</span>
             <span class="n">popt</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
-                <span class="n">fun</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">p0</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;L-BFGS-B&#39;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span>
+                <span class="n">fun</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">p0_i</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;L-BFGS-B&#39;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;disp&#39;</span><span class="p">:</span> <span class="n">verbose</span><span class="p">})</span>
+
             <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">popt</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span>
             <span class="n">fval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">popt</span><span class="p">[</span><span class="s">&#39;fun&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&quot;      -MLL(</span><span class="si">%s</span><span class="s">) = </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fval</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;-MLL(</span><span class="si">%s</span><span class="s">) = </span><span class="si">%f</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fval</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">popt</span><span class="p">[</span><span class="s">&#39;success&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">fval</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;MLII failed, p=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">fval</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="c"># choose the parameters that give the best MLL</span>
-        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">fval</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">fval</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;Could not find MLII parameter estimates&quot;</span><span class="p">)</span>
 
         <span class="c"># update our parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">fval</span><span class="p">)])</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmin</span><span class="p">(</span><span class="n">fval</span><span class="p">)])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Best parameters: </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
@@ -822,7 +855,7 @@
         <li class="right" >
           <a href="../../np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

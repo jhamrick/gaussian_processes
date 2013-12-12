@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: gaussian-processes
+Version: 1.0.1
+Summary: Python library for gaussian processes
+Home-page: https://github.com/jhamrick/gaussian_processes
+Author: Jessica B. Hamrick
+Author-email: jhamrick@berkeley.edu
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: gp kernel statistics
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Topic :: Scientific/Engineering :: Mathematics

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gp.kernels.base &mdash; gaussian_processes 1.0.1 documentation</title>
+    <title>gp.kernels.base &mdash; gaussian_processes 1.0.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.0.1',
+        VERSION:     '1.0.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="gaussian_processes 1.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="gaussian_processes 1.0.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../../../np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -97,7 +97,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </div>
-<div class="viewcode-block" id="Kernel.K"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<div class="viewcode-block" id="Kernel.K"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">        Kernel function evaluated at `x1` and `x2`.</span>
 
@@ -117,10 +117,10 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </div>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Kernel.jacobian"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<div class="viewcode-block" id="Kernel.jacobian"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.jacobian">[docs]</a>    <span class="k">def</span> <span class="nf">jacobian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">        Jacobian of the kernel function evaluated at `x1` and `x2`.</span>
 
@@ -140,7 +140,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </div>
-<div class="viewcode-block" id="Kernel.hessian"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.hessian">[docs]</a>    <span class="k">def</span> <span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<div class="viewcode-block" id="Kernel.hessian"><a class="viewcode-back" href="../../../gp.kernels.Kernel.html#gp.kernels.base.Kernel.hessian">[docs]</a>    <span class="k">def</span> <span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;</span>
 <span class="sd">        Hessian of the kernel function evaluated at `x1` and `x2`.</span>
 
@@ -196,7 +196,7 @@
         <li class="right" >
           <a href="../../../np-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">gaussian_processes 1.0.1 documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">gaussian_processes 1.0.2 documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
