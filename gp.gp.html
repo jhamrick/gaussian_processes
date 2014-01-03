@@ -385,48 +385,6 @@ number of parameters (see <tt class="xref py py-obj docutils literal"><span clas
 \[\frac{\partial}{\partial \theta_i}m(\mathbf{x^*})=\frac{\partial K(\mathbf{x^*}, \mathbf{x})}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y} - K(\mathbf{x^*}, \mathbf{x})\mathbf{K}_{xx}^{-1}\frac{\partial \mathbf{K}_{xx}}{\partial \theta_i}\mathbf{K}_{xx}^{-1}\mathbf{y}\]</div>
 </dd></dl>
 
-<dl class="method">
-<dt id="gp.gp.GP.fit_MLII">
-<tt class="descname">fit_MLII</tt><big>(</big><em>params_to_fit</em>, <em>randf=None</em>, <em>nrestart=5</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/gp/gp.html#GP.fit_MLII"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.fit_MLII" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit parameters of the gaussian process using MLII (maximum
-likelihood) estimation.</p>
-<p>Note that this method modifies the gaussian process in
-place. After the method is run, the <tt class="xref py py-obj docutils literal"><span class="pre">GP</span></tt> object will have new
-parameters set to the best ones found during the optimization.</p>
-<p>The optimization algorithm used is L-BFGS-B.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><p class="first"><strong>params_to_fit</strong> : boolean array_like</p>
-<blockquote>
-<div><p>A list of booleans corresponding to the gaussian process
-parameters, indicating which parameters should be
-fit. Parameters which are not fit keep their current value.</p>
-</div></blockquote>
-<p><strong>randf</strong> : list of functions (optional)</p>
-<blockquote>
-<div><p>A list of functions to give an initial starting value for
-each parameter that is being fit. The functions should
-take no arguments, and return a numpy.float64. If not
-specified, the functions default to <tt class="docutils literal"><span class="pre">lambda:</span>
-<span class="pre">abs(numpy.random.normal())</span></tt>.</p>
-</div></blockquote>
-<p><strong>nrestart</strong> : int (optional)</p>
-<blockquote>
-<div><p>Number of random restarts to use. The best parameters out of
-all the random restarts are used.</p>
-</div></blockquote>
-<p><strong>verbose</strong> : bool (optional)</p>
-<blockquote class="last">
-<div><p>Whether to print information about the optimization.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="gp.gp.GP.inv_Kxx">
 <tt class="descname">inv_Kxx</tt><a class="reference internal" href="_modules/gp/gp.html#GP.inv_Kxx"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#gp.gp.GP.inv_Kxx" title="Permalink to this definition">¶</a></dt>
