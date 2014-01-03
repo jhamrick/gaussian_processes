@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.0.3
+
+* Fix bugs in documentation generation
+* Remove `fit_MLII` method, because it was not robust
+
 ## Version 1.0.2
 
 * Miscellaneous bugfixes
