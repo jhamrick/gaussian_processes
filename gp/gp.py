@@ -1,10 +1,10 @@
 __all__ = ["GP"]
 
 import numpy as np
-import copy
 import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import logging
+from copy import copy, deepcopy
 
 from .ext import gp_c
 
@@ -61,19 +61,68 @@ class GP(object):
         Initialize the GP.
 
         """
-        self._memoized = {}
-        self._x = None
-        self._y = None
-        self._s = None
-        self.n = 0
-
         #: Kernel for the gaussian process, of type
         #: :class:`~gp.kernels.base.Kernel`
         self.K = K
+        self._x = None
+        self._y = None
+        self._s = None
+        self._memoized = {}
 
         self.x = x
         self.y = y
         self.s = s
+
+    def __getstate__(self):
+        state = {}
+        state['K'] = self.K
+        state['_x'] = self._x
+        state['_y'] = self._y
+        state['_s'] = self._s
+        state['_memoized'] = self._memoized
+        return state
+
+    def __setstate__(self, state):
+        self.K = state['K']
+        self._x = state['_x']
+        self._y = state['_y']
+        self._s = state['_s']
+        self._memoized = state['_memoized']
+
+    def __copy__(self):
+        state = self.__getstate__()
+        cls = type(self)
+        gp = cls.__new__(cls)
+        gp.__setstate__(state)
+        return gp
+
+    def __deepcopy__(self, memo):
+        state = deepcopy(self.__getstate__(), memo)
+        cls = type(self)
+        gp = cls.__new__(cls)
+        gp.__setstate__(state)
+        return gp
+
+    def copy(self, deep=True):
+        """
+        Create a copy of the gaussian process object.
+
+        Parameters
+        ----------
+        deep : bool (default=True)
+            Whether to return a deep or shallow copy
+
+        Returns
+        -------
+        gp : :class:`~gp.gp.GP`
+            New gaussian process object
+
+        """
+        if deep:
+            gp = deepcopy(self)
+        else:
+            gp = copy(self)
+        return gp
 
     @property
     def x(self):
@@ -93,8 +142,8 @@ class GP(object):
     def x(self, val):
         if np.any(val != self._x):
             self._memoized = {}
-            self._x = val.astype(DTYPE)
-            self.n, = self.x.shape
+            self._x = np.array(val, copy=True, dtype=DTYPE)
+            self._x.flags.writeable = False
         else: # pragma: no cover
             pass
 
@@ -116,8 +165,9 @@ class GP(object):
     def y(self, val):
         if np.any(val != self._y):
             self._memoized = {}
-            self._y = val.astype(DTYPE)
-            if self.y.shape != (self.n,):
+            self._y = np.array(val, copy=True, dtype=DTYPE)
+            self._y.flags.writeable = False
+            if self.y.shape != self.x.shape:
                 raise ValueError("invalid shape for y: %s" % str(self.y.shape))
         else: # pragma: no cover
             pass
@@ -156,7 +206,9 @@ class GP(object):
            observation noise parameter, :math:`s`, in that order.
 
         """
-        _params = np.concatenate([self.K.params, [self._s]])
+        _params = np.empty(self.K.params.size + 1)
+        _params[:-1] = self.K.params
+        _params[-1] = self._s
         return _params
 
     @params.setter
@@ -178,20 +230,6 @@ class GP(object):
             self.K.set_param(name, val)
         else: # pragma: no cover
             pass
-
-    def copy(self):
-        """
-        Create a copy of the gaussian process object.
-
-        Returns
-        -------
-        gp : :class:`~gp.gp.GP`
-            New gaussian process object
-
-        """
-        new_gp = GP(self.K.copy(), self.x, self.y, s=self.s)
-        new_gp._memoized = copy.deepcopy(self._memoized)
-        return new_gp
 
     @memoprop
     def Kxx(self):

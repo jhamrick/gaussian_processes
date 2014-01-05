@@ -1,7 +1,10 @@
 import pytest
 import numpy as np
-from numpy import dot
 import matplotlib.pyplot as plt
+import pickle
+
+from numpy import dot
+from copy import copy, deepcopy
 
 from .. import GP
 from .. import GaussianKernel as kernel
@@ -71,7 +74,7 @@ def test_inv():
 
 def test_dloglh():
     def check_dloglh(gp):
-        params = gp.params.copy()
+        params = gp.params
         jac = gp.dloglh_dtheta
 
         approx_jac = np.empty(jac.shape)
@@ -96,7 +99,7 @@ def test_dloglh():
 
 def test_dlh():
     def check_dlh(gp):
-        params = gp.params.copy()
+        params = gp.params
         jac = gp.dlh_dtheta
 
         approx_jac = np.empty(jac.shape)
@@ -121,7 +124,7 @@ def test_dlh():
 
 def test_d2lh():
     def check_d2lh(gp):
-        params = gp.params.copy()
+        params = gp.params
         hess = gp.d2lh_dtheta2
 
         approx_hess = np.empty(hess.shape)
@@ -148,7 +151,7 @@ def test_dm():
     xo = make_xo()
 
     def check_dm(gp):
-        params = gp.params.copy()
+        params = gp.params
         jac = gp.dm_dtheta(xo)
 
         approx_jac = np.empty(jac.shape)
@@ -276,7 +279,7 @@ def test_reset_memoized():
     yield check_memoized, "x", gp.x.copy() + 1
     yield check_memoized, "y", gp.y.copy() + 1
     yield check_memoized, "s", gp.s + 1
-    yield check_memoized, "params", gp.params.copy() + 1
+    yield check_memoized, "params", gp.params + 1
 
 
 def test_set_y():
@@ -348,3 +351,77 @@ def test_plot():
     gp.plot(xlim=[0, 1])
 
     plt.close('all')
+
+
+def test_copy_method():
+    gp1 = make_gp()
+    gp2 = gp1.copy(deep=False)
+    
+    assert gp1 is not gp2
+    assert gp1._x is gp2._x
+    assert gp1._y is gp2._y
+    assert gp1._s is gp2._s
+    assert gp1.K is gp2.K
+
+
+def test_copy():
+    gp1 = make_gp()
+    gp2 = copy(gp1)
+    
+    assert gp1 is not gp2
+    assert gp1._x is gp2._x
+    assert gp1._y is gp2._y
+    assert gp1._s is gp2._s
+    assert gp1.K is gp2.K
+
+
+def test_deepcopy_method():
+    gp1 = make_gp()
+    gp2 = gp1.copy(deep=True)
+    
+    assert gp1 is not gp2
+    assert gp1._x is not gp2._x
+    assert gp1._y is not gp2._y
+    assert gp1._s is not gp2._s
+    assert gp1.K is not gp2.K
+    assert gp1.K.params is not gp2.K.params
+
+    assert (gp1._x == gp2._x).all()
+    assert (gp1._y == gp2._y).all()
+    assert gp1._s == gp2._s
+    assert (gp1.K.params == gp2.K.params).all()
+
+
+def test_deepcopy():
+    gp1 = make_gp()
+    gp2 = deepcopy(gp1)
+    
+    assert gp1 is not gp2
+    assert gp1._x is not gp2._x
+    assert gp1._y is not gp2._y
+    assert gp1._s is not gp2._s
+    assert gp1.K is not gp2.K
+    assert gp1.K.params is not gp2.K.params
+
+    assert (gp1._x == gp2._x).all()
+    assert (gp1._y == gp2._y).all()
+    assert gp1._s == gp2._s
+    assert (gp1.K.params == gp2.K.params).all()
+
+
+def test_pickle():
+    gp1 = make_gp()
+    state = pickle.dumps(gp1)
+    gp2 = pickle.loads(state)
+
+    assert gp1 is not gp2
+    assert gp1._x is not gp2._x
+    assert gp1._y is not gp2._y
+    assert gp1._s is not gp2._s
+    assert gp1.K is not gp2.K
+    assert gp1.K.params is not gp2.K.params
+
+    assert (gp1._x == gp2._x).all()
+    assert (gp1._y == gp2._y).all()
+    assert gp1._s == gp2._s
+    assert (gp1.K.params == gp2.K.params).all()

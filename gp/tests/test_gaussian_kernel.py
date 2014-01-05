@@ -1,5 +1,7 @@
 import scipy.stats
 import numpy as np
+from copy import copy, deepcopy
+import pickle
 
 from .. import GaussianKernel
 from .util import opt, rand_params, seed, allclose
@@ -148,3 +150,41 @@ def test_d2K_dwdw():
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'w', 'w', 1)
+
+
+def test_copy_method():
+    kernel1 = make_random_kernel()
+    kernel2 = kernel1.copy()
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+
+
+def test_copy():
+    kernel1 = make_random_kernel()
+    kernel2 = copy(kernel1)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+
+
+def test_deepcopy():
+    kernel1 = make_random_kernel()
+    kernel2 = deepcopy(kernel1)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.h is not kernel2.h
+    assert kernel1.w is not kernel2.w
+
+
+def test_pickle():
+    kernel1 = make_random_kernel()
+    state = pickle.dumps(kernel1)
+    kernel2 = pickle.loads(state)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.h is not kernel2.h
+    assert kernel1.w is not kernel2.w
+    

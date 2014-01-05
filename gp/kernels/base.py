@@ -1,9 +1,23 @@
 __all__ = ['Kernel']
 
 from functools import wraps
+from copy import copy
 
 
 class Kernel(object):
+
+    def __getstate__(self):
+        state = {'params': self.params}
+        return state
+
+    def __setstate__(self, state):
+        self.params = state['params']
+
+    def __copy__(self):
+        return type(self)(*self.params)
+
+    def __deepcopy__(self, memo):
+        return type(self)(*self.params)
 
     def copy(self):
         """
@@ -15,7 +29,7 @@ class Kernel(object):
             New kernel function object of type ``type(self)``.
 
         """
-        return type(self)(*self.params)
+        return copy(self)
 
     def sym_K(self):
         """

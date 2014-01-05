@@ -1,4 +1,6 @@
 import numpy as np
+import pickle
+from copy import copy, deepcopy
 
 from .. import PeriodicKernel
 from .util import opt, rand_params, seed, allclose
@@ -198,3 +200,47 @@ def test_d2K_dpdp():
     for i in xrange(N_SMALL):
         kernel = make_random_kernel()
         yield (check_d2K_dtheta2, kernel, x, 'p', 'p', 2)
+
+
+
+def test_copy_method():
+    kernel1 = make_random_kernel()
+    kernel2 = kernel1.copy()
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.p == kernel2.p
+
+
+def test_copy():
+    kernel1 = make_random_kernel()
+    kernel2 = copy(kernel1)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.p == kernel2.p
+
+
+def test_deepcopy():
+    kernel1 = make_random_kernel()
+    kernel2 = deepcopy(kernel1)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.p == kernel2.p
+    assert kernel1.h is not kernel2.h
+    assert kernel1.w is not kernel2.w
+    assert kernel1.p is not kernel2.p
+
+
+def test_pickle():
+    kernel1 = make_random_kernel()
+    state = pickle.dumps(kernel1)
+    kernel2 = pickle.loads(state)
+
+    assert kernel1.h == kernel2.h
+    assert kernel1.w == kernel2.w
+    assert kernel1.p == kernel2.p
+    assert kernel1.h is not kernel2.h
+    assert kernel1.w is not kernel2.w
+    assert kernel1.p is not kernel2.p
