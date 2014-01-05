@@ -1,4 +1,5 @@
-#cython: boundscheck=False
+# cython: boundscheck=False
+# cython: wraparound=False
 
 from __future__ import division
 
@@ -13,7 +14,7 @@ ctypedef np.float64_t DTYPE_t
 cdef DTYPE_t MIN = log(np.exp2(DTYPE(np.finfo(DTYPE).minexp + 4)))
 
 
-def log_lh(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] K, np.ndarray[DTYPE_t, ndim=1] Kiy):
+def log_lh(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c', ndim=2] K, np.ndarray[DTYPE_t, mode='c', ndim=1] Kiy):
     cdef int sign
     cdef DTYPE_t logdet, data_fit, complexity_penalty, constant, llh
 
@@ -30,11 +31,11 @@ def log_lh(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] K, np.ndar
     return llh
 
 
-def dloglh_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np.ndarray[DTYPE_t, ndim=3] Kj, np.ndarray[DTYPE_t, ndim=1] Kiy, DTYPE_t s, np.ndarray[DTYPE_t, ndim=1] dloglh):
+def dloglh_dtheta(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c', ndim=2] Ki, np.ndarray[DTYPE_t, mode='c', ndim=3] Kj, np.ndarray[DTYPE_t, mode='c', ndim=1] Kiy, DTYPE_t s, np.ndarray[DTYPE_t, mode='c', ndim=1] dloglh):
     cdef int n = Kj.shape[0]
     cdef int m = Kj.shape[1]
     cdef int i
-    cdef np.ndarray[DTYPE_t, ndim=2] k = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] k = np.empty((m, m), dtype=DTYPE)
     cdef DTYPE_t t0, t1
 
     for i in xrange(n+1):
@@ -48,11 +49,11 @@ def dloglh_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki,
         dloglh[i] = t0 + t1
 
 
-def dlh_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np.ndarray[DTYPE_t, ndim=3] Kj, np.ndarray[DTYPE_t, ndim=1] Kiy, DTYPE_t s, DTYPE_t lh, np.ndarray[DTYPE_t, ndim=1] dlh):
+def dlh_dtheta(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c', ndim=2] Ki, np.ndarray[DTYPE_t, mode='c', ndim=3] Kj, np.ndarray[DTYPE_t, mode='c', ndim=1] Kiy, DTYPE_t s, DTYPE_t lh, np.ndarray[DTYPE_t, mode='c', ndim=1] dlh):
     cdef int n = Kj.shape[0]
     cdef int m = Kj.shape[1]
     cdef int i
-    cdef np.ndarray[DTYPE_t, ndim=2] k = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] k = np.empty((m, m), dtype=DTYPE)
     cdef DTYPE_t t0, t1
 
     for i in xrange(n+1):
@@ -66,15 +67,15 @@ def dlh_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np
         dlh[i] = 0.5 * lh * (t0 - t1)
 
 
-def d2lh_dtheta2(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np.ndarray[DTYPE_t, ndim=3] Kj, np.ndarray[DTYPE_t, ndim=4] Kh, np.ndarray[DTYPE_t, ndim=1] Kiy, DTYPE_t s, DTYPE_t lh, np.ndarray[DTYPE_t, ndim=1] dlh, np.ndarray[DTYPE_t, ndim=2] d2lh):
+def d2lh_dtheta2(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c', ndim=2] Ki, np.ndarray[DTYPE_t, mode='c', ndim=3] Kj, np.ndarray[DTYPE_t, mode='c', ndim=4] Kh, np.ndarray[DTYPE_t, mode='c', ndim=1] Kiy, DTYPE_t s, DTYPE_t lh, np.ndarray[DTYPE_t, mode='c', ndim=1] dlh, np.ndarray[DTYPE_t, mode='c', ndim=2] d2lh):
     cdef int n = Kj.shape[0]
     cdef int m = Kj.shape[1]
     cdef int i, j
-    cdef np.ndarray[DTYPE_t, ndim=3] dK = np.empty((n+1, m, m), dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=3] dKi = np.empty((n+1, m, m), dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=2] d2k = np.empty((m, m), dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=2] KidK_i = np.empty((m, m), dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=2] dKi_jdK_i = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=3] dK = np.empty((n+1, m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=3] dKi = np.empty((n+1, m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] d2k = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] KidK_i = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] dKi_jdK_i = np.empty((m, m), dtype=DTYPE)
     cdef DTYPE_t ydKi_iy, ydKi_iy_tr, t0, t1, t1a, t1b, t1c
 
     for i in xrange(n+1):
@@ -110,13 +111,13 @@ def d2lh_dtheta2(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, 
             d2lh[i, j] = 0.5 * (t0 + t1)
 
 
-def dm_dtheta(np.ndarray[DTYPE_t, ndim=1] y, np.ndarray[DTYPE_t, ndim=2] Ki, np.ndarray[DTYPE_t, ndim=3] Kj, np.ndarray[DTYPE_t, ndim=3] Kjxo, np.ndarray[DTYPE_t, ndim=2] Kxox, DTYPE_t s, np.ndarray[DTYPE_t, ndim=2] dm):
+def dm_dtheta(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c', ndim=2] Ki, np.ndarray[DTYPE_t, mode='c', ndim=3] Kj, np.ndarray[DTYPE_t, mode='c', ndim=3] Kjxo, np.ndarray[DTYPE_t, mode='c', ndim=2] Kxox, DTYPE_t s, np.ndarray[DTYPE_t, mode='c', ndim=2] dm):
     cdef int n = Kj.shape[0]
     cdef int m = Kj.shape[1]
     cdef int m2 = Kjxo.shape[1]
     cdef int i
-    cdef np.ndarray[DTYPE_t, ndim=2] dKxox_dtheta = np.empty((m2, m), dtype=DTYPE)
-    cdef np.ndarray[DTYPE_t, ndim=2] dKxx_dtheta = np.empty((m, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] dKxox_dtheta = np.empty((m2, m), dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, mode='c', ndim=2] dKxx_dtheta = np.empty((m, m), dtype=DTYPE)
 
     for i in xrange(n+1):
         if i < n:

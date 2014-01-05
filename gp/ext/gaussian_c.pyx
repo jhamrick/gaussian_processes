@@ -1,4 +1,5 @@
-#cython: boundscheck=False
+# cython: boundscheck=False
+# cython: wraparound=False
 
 from __future__ import division
 
@@ -14,7 +15,7 @@ cdef DTYPE_t SQRT_2_DIV_PI = sqrt(2.0 / M_PI)
 cdef DTYPE_t MIN = log(np.exp2(DTYPE(np.finfo(DTYPE).minexp + 4)))
 
 
-def K(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def K(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
@@ -35,19 +36,19 @@ def K(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarra
                 out[i, j] = c2*exp(e)
 
 
-def jacobian(np.ndarray[DTYPE_t, ndim=3] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def jacobian(np.ndarray[DTYPE_t, mode='c', ndim=3] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     dK_dh(out[0], x1, x2, h, w)
     dK_dw(out[1], x1, x2, h, w)
 
 
-def hessian(np.ndarray[DTYPE_t, ndim=4] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def hessian(np.ndarray[DTYPE_t, mode='c', ndim=4] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     d2K_dhdh(out[0, 0], x1, x2, h, w)
     d2K_dhdw(out[0, 1], x1, x2, h, w)
     d2K_dwdh(out[1, 0], x1, x2, h, w)
     d2K_dwdw(out[1, 1], x1, x2, h, w)
 
 
-def dK_dh(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def dK_dh(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
@@ -68,7 +69,7 @@ def dK_dh(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.nd
                 out[i, j] = c2*exp(e)
 
 
-def dK_dw(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def dK_dw(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
@@ -91,7 +92,7 @@ def dK_dw(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.nd
                 out[i, j] = exp(e)*(c3*d2 - c2)
 
 
-def d2K_dhdh(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def d2K_dhdh(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
@@ -112,7 +113,7 @@ def d2K_dhdh(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np
                 out[i, j] = c2*exp(e)
 
 
-def d2K_dhdw(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def d2K_dhdw(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
@@ -135,11 +136,11 @@ def d2K_dhdw(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np
                 out[i, j] = exp(e)*(c3*d2 - c2)
 
 
-def d2K_dwdh(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def d2K_dwdh(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     d2K_dhdw(out, x1, x2, h, w)
 
 
-def d2K_dwdw(np.ndarray[DTYPE_t, ndim=2] out, np.ndarray[DTYPE_t, ndim=1] x1, np.ndarray[DTYPE_t, ndim=1] x2, DTYPE_t h, DTYPE_t w):
+def d2K_dwdw(np.ndarray[DTYPE_t, mode='c', ndim=2] out, np.ndarray[DTYPE_t, mode='c', ndim=1] x1, np.ndarray[DTYPE_t, mode='c', ndim=1] x2, DTYPE_t h, DTYPE_t w):
     cdef int x1_s = x1.size
     cdef int x2_s = x2.size
     cdef int i, j
