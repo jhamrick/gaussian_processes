@@ -35,13 +35,11 @@ class GaussianKernel(Kernel):
     """
 
     def __init__(self, h, w):
-        if h < EPS:
-            raise ValueError("invalid value for h: %s" % h)
-        if w < EPS:
-            raise ValueError("invalid value for w: %s" % w)
+        self.h = None #: Output scale kernel parameter
+        self.w = None #: Input scale kernel parameter
 
-        self.h = DTYPE(h) #: Output scale kernel parameter
-        self.w = DTYPE(w) #: Input scale kernel parameter
+        self.set_param('h', h)
+        self.set_param('w', w)
 
     @property
     def params(self):
@@ -57,15 +55,22 @@ class GaussianKernel(Kernel):
 
     @params.setter
     def params(self, val):
-        h, w = val
+        self.set_param('h', val[0])
+        self.set_param('w', val[1])
 
-        if h < EPS:
-            raise ValueError("invalid value for h: %s" % h)
-        if w < EPS:
-            raise ValueError("invalid value for w: %s" % w)
+    def set_param(self, name, val):
+        if name == 'h':
+            if val < EPS:
+                raise ValueError("invalid value for h: %s" % val)
+            self.h = DTYPE(val)
 
-        self.h = DTYPE(h)
-        self.w = DTYPE(w)
+        elif name == 'w':
+            if val < EPS:
+                raise ValueError("invalid value for w: %s" % val)
+            self.w = DTYPE(val)
+
+        else:
+            raise ValueError("unknown parameter: %s" % name)
 
     @property
     @wraps(Kernel.sym_K)

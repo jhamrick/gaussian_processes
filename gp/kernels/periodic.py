@@ -37,16 +37,13 @@ class PeriodicKernel(Kernel):
     """
 
     def __init__(self, h, w, p):
-        if h < EPS:
-            raise ValueError("invalid value for h: %s" % h)
-        if w < EPS:
-            raise ValueError("invalid value for w: %s" % w)
-        if p < EPS:
-            raise ValueError("invalid value for p: %s" % w)
+        self.h = None #: Output scale kernel parameter
+        self.w = None #: Input scale kernel parameter
+        self.p = None #: Period kernel parameter
 
-        self.h = DTYPE(h) #: Output scale kernel parameter
-        self.w = DTYPE(w) #: Input scale kernel parameter
-        self.p = DTYPE(p) #: Period kernel parameter
+        self.set_param('h', h)
+        self.set_param('w', w)
+        self.set_param('p', p)
 
     @property
     def params(self):
@@ -62,18 +59,28 @@ class PeriodicKernel(Kernel):
 
     @params.setter
     def params(self, val):
-        h, w, p = val
+        self.set_param('h', val[0])
+        self.set_param('w', val[1])
+        self.set_param('p', val[2])
 
-        if h < EPS:
-            raise ValueError("invalid value for h: %s" % h)
-        if w < EPS:
-            raise ValueError("invalid value for w: %s" % w)
-        if p < EPS:
-            raise ValueError("invalid value for p: %s" % w)
+    def set_param(self, name, val):
+        if name == 'h':
+            if val < EPS:
+                raise ValueError("invalid value for h: %s" % val)
+            self.h = DTYPE(val)
 
-        self.h = DTYPE(h)
-        self.w = DTYPE(w)
-        self.p = DTYPE(p)
+        elif name == 'w':
+            if val < EPS:
+                raise ValueError("invalid value for w: %s" % val)
+            self.w = DTYPE(val)
+
+        elif name == 'p':
+            if val < EPS:
+                raise ValueError("invalid value for p: %s" % val)
+            self.p = DTYPE(val)
+
+        else:
+            raise ValueError("unknown parameter: %s" % name)
 
     @property
     @wraps(Kernel.sym_K)

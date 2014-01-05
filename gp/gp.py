@@ -70,7 +70,6 @@ class GP(object):
         #: Kernel for the gaussian process, of type
         #: :class:`~gp.kernels.base.Kernel`
         self.K = K
-        self._params = np.empty(K.params.size + 1, dtype=DTYPE)
 
         self.x = x
         self.y = y
@@ -157,9 +156,8 @@ class GP(object):
            observation noise parameter, :math:`s`, in that order.
 
         """
-        self._params[:-1] = self.K.params
-        self._params[-1] = self._s
-        return self._params
+        _params = np.concatenate([self.K.params, [self._s]])
+        return _params
 
     @params.setter
     def params(self, val):
@@ -167,6 +165,17 @@ class GP(object):
             self._memoized = {}
             self.K.params = val[:-1]
             self.s = val[-1]
+        else: # pragma: no cover
+            pass
+
+    def get_param(self, name):
+        return getattr(self.K, name)
+
+    def set_param(self, name, val):
+        p = getattr(self.K, name)
+        if p != val:
+            self._memoized = {}
+            self.K.set_param(name, val)
         else: # pragma: no cover
             pass
 
