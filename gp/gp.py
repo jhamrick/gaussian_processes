@@ -690,5 +690,5 @@ class GP(object):
 
         ax.fill_between(X, lower, upper, color=color, alpha=0.3)
         ax.plot(X, mean, lw=2, color=color)
-        ax.plot(x, y, 'o', ms=7, color=markercolor)
+        ax.plot(x, y, 'o', ms=5, color=markercolor)
         ax.set_xlim(*xlim)
