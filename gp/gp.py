@@ -285,7 +285,8 @@ class GP(object):
         :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.
 
         """
-        return cholesky(self.Kxx, lower=True, overwrite_a=False, check_finite=True)
+        Lxx = cholesky(self.Kxx, lower=True, overwrite_a=False, check_finite=True)
+        return np.asarray(Lxx, order='C')
 
     @memoprop
     def inv_Kxx(self):
