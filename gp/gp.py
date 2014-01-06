@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.optimize as optim
 import logging
+
+from scipy.linalg import cholesky, cho_solve
 from copy import copy, deepcopy
 
 from .ext import gp_c
@@ -283,31 +285,16 @@ class GP(object):
         :math:`\mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top`.
 
         """
-        return np.linalg.cholesky(self.Kxx)
-
-    @memoprop
-    def inv_Lxx(self):
-        r"""
-        Inverse cholesky decomposition of the kernel covariance matrix.
-
-        Returns
-        -------
-        inv_Lxx : numpy.ndarray
-            :math:`n\times n` matrix
-
-        Notes
-        -----
-        The value is :math:`\mathbf{L}_{xx}^{-1}`, such that:
-
-        .. math:: \mathbf{K}_{xx} = \mathbf{L}_{xx}\mathbf{L}_{xx}^\top
-
-        """
-        return np.linalg.inv(self.Lxx)
+        return cholesky(self.Kxx, lower=True, overwrite_a=False, check_finite=True)
 
     @memoprop
     def inv_Kxx(self):
         r"""
         Inverse kernel covariance matrix, :math:`\mathbf{K}_{xx}^{-1}`.
+
+        Note that this inverse is provided mostly just for
+        reference. If you actually need to use it, use the Cholesky
+        decomposition (`self.Lxx`) instead.
 
         Returns
         -------
@@ -315,14 +302,16 @@ class GP(object):
             :math:`n\times n` matrix
 
         """
-        Li = self.inv_Lxx
-        return np.dot(Li.T, Li)
+        inv_Lxx = np.linalg.inv(self.Lxx)
+        return np.dot(inv_Lxx.T, inv_Lxx)
 
     @memoprop
     def inv_Kxx_y(self):
         r"""
         Dot product of the inverse kernel covariance matrix and of
         observation vector.
+        
+        This uses scipy's cholesky solver to compute the solution.
 
         Returns
         -------
@@ -334,7 +323,10 @@ class GP(object):
         This is defined as :math:`\mathbf{K}_{xx}^{-1}\mathbf{y}`.
 
         """
-        return np.dot(self.inv_Kxx, self._y)
+        inv_Kxx_y = cho_solve(
+            (self.Lxx, True), self._y, 
+            overwrite_b=False, check_finite=True)
+        return inv_Kxx_y
 
     @memoprop
     def log_lh(self):

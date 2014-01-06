@@ -192,7 +192,6 @@ def test_dtypes():
     yield check_dtype, gp.Kxx_J
     yield check_dtype, gp.Kxx_H
     yield check_dtype, gp.Lxx
-    yield check_dtype, gp.inv_Lxx
     yield check_dtype, gp.inv_Kxx
     yield check_dtype, gp.inv_Kxx_y
     yield check_type, gp.log_lh
@@ -230,7 +229,6 @@ def test_shapes():
     yield check_prop_shape, 'Kxx_J', (n_p - 1, n, n)
     yield check_prop_shape, 'Kxx_H', (n_p - 1, n_p - 1, n, n)
     yield check_prop_shape, 'Lxx', (n, n)
-    yield check_prop_shape, 'inv_Lxx', (n, n)
     yield check_prop_shape, 'inv_Kxx', (n, n)
     yield check_prop_shape, 'inv_Kxx_y', (n,)
     yield check_prop_shape, 'dloglh_dtheta', (n_p,)
@@ -257,7 +255,6 @@ def test_memoprop_del():
     yield check_del, "Kxx_J"
     yield check_del, "Kxx_H"
     yield check_del, "Lxx"
-    yield check_del, "inv_Lxx"
     yield check_del, "inv_Kxx"
     yield check_del, "inv_Kxx_y"
     yield check_del, "log_lh"
@@ -324,8 +321,6 @@ def test_invalid_params():
 
     with pytest.raises(np.linalg.LinAlgError):
         gp.Lxx
-    with pytest.raises(np.linalg.LinAlgError):
-        gp.inv_Lxx
     with pytest.raises(np.linalg.LinAlgError):
         gp.inv_Kxx
     with pytest.raises(np.linalg.LinAlgError):
