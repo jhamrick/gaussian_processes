@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.0.4
+
+* Use a Cholesky solver rather than computing inverses
+* Specify C-contiguous arrays and disable wraparound in Cython code
+* Add `__copy__`, `__deepcopy__`, `__getstate__`, and `__setstate__`
+  methods to gp and kernels
+* Add methods for getting/setting kernel parameters by name
+
 ## Version 1.0.3
 
 * Fix bugs in documentation generation
