@@ -286,7 +286,7 @@ def test_set_y():
         gp.y = y[:, None]
 
 
-def test_set_params():
+def test_params():
     x, y = make_xy()
     h, w = rand_params('h', 'w')
     GP(kernel(h, w), x, y, s=0)
@@ -420,3 +420,13 @@ def test_pickle():
     assert (gp1._y == gp2._y).all()
     assert gp1._s == gp2._s
     assert (gp1.K.params == gp2.K.params).all()
+
+
+def test_set_params():
+    gp = make_gp()
+    gp.set_param('h', 1)
+    gp.set_param('w', 0.2)
+    gp.set_param('s', 0.01)
+
+    with pytest.raises(AttributeError):
+        gp.set_param('p', 1.1)

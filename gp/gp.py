@@ -223,15 +223,21 @@ class GP(object):
             pass
 
     def get_param(self, name):
-        return getattr(self.K, name)
+        if name == 's':
+            return self.s
+        else:
+            return getattr(self.K, name)
 
     def set_param(self, name, val):
-        p = getattr(self.K, name)
-        if p != val:
-            self._memoized = {}
-            self.K.set_param(name, val)
-        else: # pragma: no cover
-            pass
+        if name == 's':
+            self.s = val
+        else:
+            p = getattr(self.K, name)
+            if p != val:
+                self._memoized = {}
+                self.K.set_param(name, val)
+            else: # pragma: no cover
+                pass
 
     @memoprop
     def Kxx(self):
