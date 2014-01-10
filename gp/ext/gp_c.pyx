@@ -19,7 +19,7 @@ def log_lh(np.ndarray[DTYPE_t, mode='c', ndim=1] y, np.ndarray[DTYPE_t, mode='c'
     cdef DTYPE_t logdet, data_fit, complexity_penalty, constant, llh
 
     sign, logdet = np.linalg.slogdet(K)
-    if sign != 1:
+    if sign != 1 or logdet < MIN:
         llh = -INFINITY
 
     else:
