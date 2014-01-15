@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.0.5
+
+* Don't throw an error when setting s parameter
+* Return zero likelihood if determinant is close to zero
+
 ## Version 1.0.4
 
 * Use a Cholesky solver rather than computing inverses
